@@ -59,7 +59,22 @@ public class Renderer extends Actor
     
     public double[] castRay(double[] pos, int[] pt1, int[] pt2, double angle)
     {
-        double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
+        boolean angleIsVertical = angle == Math.PI/2 || angle == Math.PI*3/2;
+        if (pt1[0] == pt2[0]){
+            if (angleIsVertical || (pos[0] > pt1[0]) == ((270-angle) % 360 - 180 > 0))
+                return null;
+            return new double[]{pt1[0], pos[0]+(pt1[0] - pos[0])*Math.tan(angle)};
+        }
+        else if (angleIsVertical)
+        {
+            if (pt1[0] == pt2[0])
+                return null;
+            double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
+            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m))
+                return null;
+            return new double[]{pos[0], m*pos[0]+pt1[1]-m*pt1[0]};
+        }
+            
         if (Math.abs(Math.tan(angle) - m) < 0.0001)
             return null;
         if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m))
