@@ -57,34 +57,35 @@ public class Renderer extends Actor
         }   
     }
     
-    public double[] castRay(double[] pos, int[] pt1, int[] pt2, double angle)
+    public double[] castRay(double[] pos, int[] pt1, int[] pt2, double angle) // null if doesnt hit anything
     {
         boolean angleIsVertical = angle == Math.PI/2 || angle == Math.PI*3/2;
+        // for when wall is vertical
         if (pt1[0] == pt2[0]){
-            if (angleIsVertical || (pos[0] > pt1[0]) == ((270-angle) % 360 - 180 > 0))
+            if (angleIsVertical || (pos[0] > pt1[0]) == ((270-angle) % 360 - 180 > 0)) // null if both are vertical or if points away from wall
                 return null;
             return new double[]{pt1[0], pos[0]+(pt1[0] - pos[0])*Math.tan(angle)};
         }
+        // for when angle is vertical
         else if (angleIsVertical)
         {
-            if (pt1[0] == pt2[0])
-                return null;
             double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
-            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m))
+            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m)) // check if angle points away from the wall
                 return null;
             return new double[]{pos[0], m*pos[0]+pt1[1]-m*pt1[0]};
         }
+        else // normal case (no infinite slope or anything)
+        {
+            double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
+            if (Math.abs(Math.tan(angle) - m) < 0.0001) // avoid asymtote
+                return null;
+            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m)) // check if angle points awaay from wall
+                return null;
+            // return coord of intersect
+            double xIntersect = (pt1[1] - pt1[0] * m + pos[0] * Math.tan(angle) - pos[1])/(Math.tan(angle) - m);
+            double yIntersect = (xIntersect - pos[0]) * Math.tan(angle) + pos[1];
+            return new double[]{xIntersect, yIntersect};
+        }
             
-        if (Math.abs(Math.tan(angle) - m) < 0.0001)
-            return null;
-        if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m))
-            return null;
-        double xIntersect = (pt1[1] - pt1[0] * m + pos[0] * Math.tan(angle) - pos[1])/(Math.tan(angle) - m);
-        if (pt2[0] - pt1[0] == 0)
-            xIntersect = pt1[0];
-        double yIntersect = (xIntersect - pos[0]) * Math.tan(angle) + pos[1];
-        if (angle == Math.PI / 2 || angle == Math.PI / 2 * 3)
-            yIntersect = m * xIntersect + pt1[1] - pt1[0] * m;
-        return new double[]{xIntersect, yIntersect};
     }
 }
