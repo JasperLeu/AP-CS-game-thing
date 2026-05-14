@@ -88,8 +88,8 @@ public class Renderer extends Actor
     
     public double[] castRay(double[] pos, int[] pt1, int[] pt2, double angle) // null if doesnt hit anything
     {
-        boolean angleIsVertical = angle == Math.PI/2 || angle == Math.PI*3/2;
         double angleInDeg = angle * 180 / Math.PI;
+        boolean angleIsVertical = Math.abs(Math.round(angleInDeg)%360) == 90 || Math.abs(Math.round(angleInDeg)%360) == 270;
         double[] hitPt;
         // for when wall is vertical
         if (pt1[0] == pt2[0]){
@@ -101,15 +101,14 @@ public class Renderer extends Actor
         else if (angleIsVertical)
         {
             double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
-            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.sin(angle) > m*Math.cos(angle))) // check if angle points awaay from wall
+            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.sin(angle) > m*Math.cos(angle)))
                 return null;
+            // check if angle points awaay from wall
             hitPt = new double[]{pos[0], m*pos[0]+pt1[1]-m*pt1[0]};
         }
         else // normal case (no infinite slope or anything)
         {
             double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
-            if (Math.abs(Math.tan(angle) - m) < 0.0001) // avoid asymtote
-                return null;
             if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.sin(angle) > m*Math.cos(angle))) // check if angle points awaay from wall
                 return null;
             // return coord of intersect
