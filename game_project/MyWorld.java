@@ -26,26 +26,10 @@ public class MyWorld extends World
     private void prepare()
     {
         Player player = new Player();
-        addObject(player,410,101);
-        player.setLocation(494,75);
+        addObject(player,550,50);
         Walls walls = new Walls();
-        addObject(walls,524,85);
-        walls.setLocation(422,94);
-        player.setLocation(474,119);
+        addObject(walls,580,380);
         Renderer renderer = new Renderer();
-        addObject(renderer,472,192);
-        renderer.setLocation(432,200);
-        renderer.setLocation(417,156);
-        walls.setLocation(440,119);
-        walls.setLocation(329,137);
-        renderer.setLocation(440,242);
-        player.setLocation(485,153);
-        walls.setLocation(581,69);
-        walls.setLocation(563,364);
-        walls.setLocation(582,404);
-        walls.setLocation(559,379);
-        renderer.setLocation(573,341);
-        player.setLocation(556,248);
-        player.setLocation(556,296);
+        addObject(renderer,550,350);
     }
 }

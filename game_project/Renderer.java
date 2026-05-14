@@ -101,7 +101,7 @@ public class Renderer extends Actor
         else if (angleIsVertical)
         {
             double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
-            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m)) // check if angle points away from the wall
+            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.sin(angle) > m*Math.cos(angle))) // check if angle points awaay from wall
                 return null;
             hitPt = new double[]{pos[0], m*pos[0]+pt1[1]-m*pt1[0]};
         }
