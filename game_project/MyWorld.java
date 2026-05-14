@@ -40,5 +40,12 @@ public class MyWorld extends World
         walls.setLocation(329,137);
         renderer.setLocation(440,242);
         player.setLocation(485,153);
+        walls.setLocation(581,69);
+        walls.setLocation(563,364);
+        walls.setLocation(582,404);
+        walls.setLocation(559,379);
+        renderer.setLocation(573,341);
+        player.setLocation(556,248);
+        player.setLocation(556,296);
     }
 }

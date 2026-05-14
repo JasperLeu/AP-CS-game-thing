@@ -21,14 +21,14 @@ public class Player extends Actor
     public Player()
     {
         super();
-        moveSpeed = 1;
+        moveSpeed = 5;
         turnSpeed = Math.PI/2;
     }
     
     public void act()
     {
         move();
-        setLocation((int)(x*10+200), (int)(-y*10+200));
+        //setLocation((int)(x*10+200), (int)(-y*10+200));
         setRotation((int)(-rot * 180 / Math.PI)+90);
         // Add your action code here.
     }

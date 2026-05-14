@@ -8,17 +8,30 @@ import java.util.ArrayList;
  */
 public class Renderer extends Actor
 {   
+    private double FOV;
+    private int WALL_HEIGHT;
+    private Color WALL_COLOR;
+    private Color FLOOR_COLOR;
+    private Color CEILING_COLOR;
+    
     private Player player;
     private ArrayList<int[]> walls;
-    private double[] distances;
-    private double FOV;
+    private int WIDTH;
+    private int HEIGHT;
     
     protected void addedToWorld(World world)
     {
-        // initialize references n stuff
+        // Render Constants
+        WIDTH = world.getWidth();
+        HEIGHT = world.getHeight();
+        FOV = 60 * Math.PI / 180;
+        WALL_COLOR = new Color(255, 240, 180);
+        FLOOR_COLOR = new Color(150, 200, 130, 255);
+        CEILING_COLOR = new Color(150, 200, 255);
+        WALL_HEIGHT = 1800;
+        // initialize references
         player =  world.getObjects(Player.class).get(0);
         walls = ((Walls)world.getObjects(Walls.class).get(0)).getWalls();
-        FOV = 60 * Math.PI / 180;
     }
     /**
      * Act - do whatever the Renderer wants to do. This method is called whenever
@@ -26,45 +39,68 @@ public class Renderer extends Actor
      */
     public void act()
     {
-        // Loop through each x pixel and find the distance of the ray cast at that point
+        drawBackground();
+        drawWalls();
+    }
+    
+    public void drawBackground()
+    {
         GreenfootImage image = getWorld().getBackground();
         image.setColor(new Color(255, 255, 255));
         image.fill();
-        for (int x = 0; x < getWorld().getWidth(); x++)
+        image.setColor(FLOOR_COLOR);
+        image.fillRect(0, HEIGHT/2, WIDTH, HEIGHT/2);
+        image.setColor(CEILING_COLOR);
+        image.fillRect(0, 0, WIDTH, HEIGHT/2);
+    }
+    
+    public void drawWalls()
+    {
+        GreenfootImage image = getWorld().getBackground();
+        for (int x = 0; x < WIDTH; x++)
         {
-            double angle = player.getRot() - FOV/2 + (double)x / getWorld().getWidth() * FOV;
+            double angle = player.getRot() - FOV/2 + (double)x / WIDTH * FOV;
             double closestDist = Integer.MAX_VALUE;
-            for (int i = 1; i < walls.size(); i ++)
+            for (int i = 1; i <= walls.size(); i ++)
             {
-                double[] hitPt = castRay(player.getPos(), walls.get(i-1), walls.get(i), angle);
+                double[] hitPt = castRay(player.getPos(), walls.get(i-1), walls.get(i%walls.size()), angle);
                 if (hitPt == null)
                     continue;
                 double dist = Math.sqrt(Math.pow(player.getPos()[0]-hitPt[0], 2) + Math.pow(player.getPos()[1]-hitPt[1], 2));
-                if (hitPt[0] <= Math.max(walls.get(i)[0], walls.get(i-1)[0]) && hitPt[0] >= Math.min(walls.get(i)[0], walls.get(i-1)[0]) && dist < closestDist)
-                {
+                // Check if the intersection is even within the bounds of the wall
+                int minX = Math.min(walls.get(i%walls.size())[0], walls.get(i-1)[0]);
+                int maxX = Math.max(walls.get(i%walls.size())[0], walls.get(i-1)[0]);
+                int minY = Math.min(walls.get(i%walls.size())[1], walls.get(i-1)[1]);
+                int maxY = Math.max(walls.get(i%walls.size())[1], walls.get(i-1)[1]);
+                int roundX = (int)Math.round(hitPt[0]);
+                int roundY = (int)Math.round(hitPt[1]);
+                if (roundX <= maxX && roundX >= minX && roundY <= maxY && roundY >= minY && dist < closestDist)
                     closestDist = dist;
-                    System.out.println(hitPt[0] + ", " + hitPt[1]);
-                }
             }    
-            int v = 255 - (int)(closestDist * 10);
-            v = Math.clamp(v, 0, 255);
-            image.setColor(new Color(v, v, v));
-            int height = getWorld().getHeight();
+            int v = -(int)(closestDist * 10);
+            int r = Math.clamp(WALL_COLOR.getRed()+v, 0, 255);
+            int g = Math.clamp(WALL_COLOR.getGreen()+v, 0, 255);
+            int b = Math.clamp(WALL_COLOR.getBlue()+v, 0, 255);
+            image.setColor(new Color(r, g, b));
+            int h = HEIGHT;
             if (closestDist > 0.01)
-                height = (int)(getWorld().getHeight() / closestDist);
-            if (closestDist < Integer.MAX_VALUE)
-                image.drawLine(player.getX(), player.getY(), 200+(int)(closestDist*10*Math.cos(angle)), 200-(int)(closestDist*10*Math.sin(angle)));
+                h = (int)(WALL_HEIGHT / closestDist);
+            if (closestDist < Integer.MAX_VALUE){
+                image.drawLine(WIDTH-x, HEIGHT/2-h/2, WIDTH-x, HEIGHT/2+h/2);
+                //image.drawLine(player.getX(), player.getY(), player.getX()+(int)(closestDist*10*Math.cos(angle)), player.getY()-(int)(closestDist*10*Math.sin(angle)));
+            }
         }   
     }
     
     public double[] castRay(double[] pos, int[] pt1, int[] pt2, double angle) // null if doesnt hit anything
     {
         boolean angleIsVertical = angle == Math.PI/2 || angle == Math.PI*3/2;
+        double angleInDeg = angle * 180 / Math.PI;
         // for when wall is vertical
         if (pt1[0] == pt2[0]){
-            if (angleIsVertical || (pos[0] > pt1[0]) == ((270-angle) % 360 - 180 > 0)) // null if both are vertical or if points away from wall
+            if (angleIsVertical || (pos[0] > pt1[0]) == (Math.abs(angleInDeg%360) < 90 || Math.abs(angleInDeg%360) > 270)) // null if both are vertical or if points away from wall
                 return null;
-            return new double[]{pt1[0], pos[0]+(pt1[0] - pos[0])*Math.tan(angle)};
+            return new double[]{pt1[0], pos[1]+(pt1[0] - pos[0])*Math.tan(angle)};
         }
         // for when angle is vertical
         else if (angleIsVertical)
@@ -79,7 +115,7 @@ public class Renderer extends Actor
             double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
             if (Math.abs(Math.tan(angle) - m) < 0.0001) // avoid asymtote
                 return null;
-            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m)) // check if angle points awaay from wall
+            if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.sin(angle) > m*Math.cos(angle))) // check if angle points awaay from wall
                 return null;
             // return coord of intersect
             double xIntersect = (pt1[1] - pt1[0] * m + pos[0] * Math.tan(angle) - pos[1])/(Math.tan(angle) - m);
