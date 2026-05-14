@@ -15,7 +15,7 @@ public class Renderer extends Actor
     private Color CEILING_COLOR;
     
     private Player player;
-    private ArrayList<int[]> walls;
+    private int[][] walls;
     private int WIDTH;
     private int HEIGHT;
     
@@ -61,22 +61,16 @@ public class Renderer extends Actor
         {
             double angle = player.getRot() - FOV/2 + (double)x / WIDTH * FOV;
             double closestDist = Integer.MAX_VALUE;
-            for (int i = 1; i <= walls.size(); i ++)
+            for (int i = 1; i <= walls.length; i ++) // Loop through each wall and get a raycast to it.
             {
-                double[] hitPt = castRay(player.getPos(), walls.get(i-1), walls.get(i%walls.size()), angle);
+                double[] hitPt = castRay(player.getPos(), walls[i-1], walls[i%walls.length], angle);
                 if (hitPt == null)
                     continue;
                 double dist = Math.sqrt(Math.pow(player.getPos()[0]-hitPt[0], 2) + Math.pow(player.getPos()[1]-hitPt[1], 2));
-                // Check if the intersection is even within the bounds of the wall
-                int minX = Math.min(walls.get(i%walls.size())[0], walls.get(i-1)[0]);
-                int maxX = Math.max(walls.get(i%walls.size())[0], walls.get(i-1)[0]);
-                int minY = Math.min(walls.get(i%walls.size())[1], walls.get(i-1)[1]);
-                int maxY = Math.max(walls.get(i%walls.size())[1], walls.get(i-1)[1]);
-                int roundX = (int)Math.round(hitPt[0]);
-                int roundY = (int)Math.round(hitPt[1]);
-                if (roundX <= maxX && roundX >= minX && roundY <= maxY && roundY >= minY && dist < closestDist)
+                if (dist < closestDist)
                     closestDist = dist;
             }    
+            // Draw the closest point from the raycast
             int v = -(int)(closestDist * 10);
             int r = Math.clamp(WALL_COLOR.getRed()+v, 0, 255);
             int g = Math.clamp(WALL_COLOR.getGreen()+v, 0, 255);
@@ -96,11 +90,12 @@ public class Renderer extends Actor
     {
         boolean angleIsVertical = angle == Math.PI/2 || angle == Math.PI*3/2;
         double angleInDeg = angle * 180 / Math.PI;
+        double[] hitPt;
         // for when wall is vertical
         if (pt1[0] == pt2[0]){
             if (angleIsVertical || (pos[0] > pt1[0]) == (Math.abs(angleInDeg%360) < 90 || Math.abs(angleInDeg%360) > 270)) // null if both are vertical or if points away from wall
                 return null;
-            return new double[]{pt1[0], pos[1]+(pt1[0] - pos[0])*Math.tan(angle)};
+            hitPt = new double[]{pt1[0], pos[1]+(pt1[0] - pos[0])*Math.tan(angle)};
         }
         // for when angle is vertical
         else if (angleIsVertical)
@@ -108,7 +103,7 @@ public class Renderer extends Actor
             double m = ((double)pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
             if ((m * pos[0] + pt1[1] - pt1[0] * m < pos[1]) == (Math.tan(angle) > m)) // check if angle points away from the wall
                 return null;
-            return new double[]{pos[0], m*pos[0]+pt1[1]-m*pt1[0]};
+            hitPt = new double[]{pos[0], m*pos[0]+pt1[1]-m*pt1[0]};
         }
         else // normal case (no infinite slope or anything)
         {
@@ -120,8 +115,17 @@ public class Renderer extends Actor
             // return coord of intersect
             double xIntersect = (pt1[1] - pt1[0] * m + pos[0] * Math.tan(angle) - pos[1])/(Math.tan(angle) - m);
             double yIntersect = (xIntersect - pos[0]) * Math.tan(angle) + pos[1];
-            return new double[]{xIntersect, yIntersect};
+            hitPt = new double[]{xIntersect, yIntersect};
         }
-            
+        // check if hit point is actually between the two specified points
+        int minX = Math.min(pt1[0], pt2[0]);
+        int maxX = Math.max(pt1[0], pt2[0]);
+        int minY = Math.min(pt1[1], pt2[1]);
+        int maxY = Math.max(pt1[1], pt2[1]);
+        double roundX = Math.round(hitPt[0]*10000)/10000;
+        double roundY = Math.round(hitPt[1]*10000)/10000;
+        if (roundX <= maxX && roundX >= minX && roundY <= maxY && roundY >= minY)
+            return hitPt;
+        return null;
     }
 }

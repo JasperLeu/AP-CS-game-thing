@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class Walls extends Actor
 {
-    private ArrayList<int[]> wallPts = new ArrayList();
+    private int[][] wallPts;
     /**
      * Act - do whatever the Walls wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
@@ -16,17 +16,9 @@ public class Walls extends Actor
     public Walls()
     {
         super();
-        int[] wallVerts = {-10, 10, 10, 10, 10, -10, -10, -10}; // Array of all the wall's coordinates {x1, y1, x2, y2, x3, y3 ... }
-        for (int i = 1; i < wallVerts.length; i+=2)
-        {
-            wallPts.add(new int[]{wallVerts[i-1], wallVerts[i]});
-        }
+        wallPts = new int[][]{{-10, 30}, {20, 30}, {20, 18}, {0, 18}, {0, 10}, {10, 10}, {10, -10}, {-10, -10}};
     }
-    public void act()
-    {
-        // Add your action code here.
-    }
-    public ArrayList<int[]> getWalls()
+    public int[][] getWalls()
     {
         return wallPts;
     }
