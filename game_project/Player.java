@@ -17,12 +17,17 @@ public class Player extends Actor
     private double rot;
     private double moveSpeed;
     private double turnSpeed;
+    private double radius = .5;
     
     public Player()
     {
         super();
-        moveSpeed = 5;
-        turnSpeed = Math.PI/2;
+        moveSpeed = 3;
+        turnSpeed = Math.PI/4;
+    }
+    protected void addedToWorld(World world)
+    {
+        ((Game)world).setPlayer(this);
     }
     
     public void act()
@@ -66,5 +71,23 @@ public class Player extends Actor
             x += mSpd * Math.cos(rot-Math.PI/2);
             y += mSpd * Math.sin(rot-Math.PI/2);
         }
+    }
+    
+    public double[] getCollision(double[][] walls)
+    {
+        for (int i = 1; i < walls.length; i++)
+        {
+            if (walls[i] == null || walls[i-1] == null)
+                continue;
+            double aSquared = Math.pow(walls[i-1][0]-x, 2)+Math.pow(walls[i-1][1]-y, 2);
+            double b = Math.sqrt(Math.pow(walls[i][0]-x, 2)+Math.pow(walls[i][1]-y, 2));
+            double c = Math.sqrt(Math.pow(walls[i-1][0]-walls[i][0], 2)+Math.pow(walls[i-1][1]-walls[i][1], 2));
+            double dist = b * Math.sin(Math.acos((Math.pow(b,2)+Math.pow(c,2)+aSquared) / (2*b*c)));
+            if (dist < radius)
+            {
+                double angle = Math.atan2(walls[i][1]-walls[i-1][1], walls[i][0]-walls[i-1][0]) - Math.PI/2;
+            }
+        }
+        return null;
     }
 }

@@ -24,14 +24,15 @@ public class Renderer extends Actor
         // Render Constants
         WIDTH = world.getWidth();
         HEIGHT = world.getHeight();
-        FOV = 60 * Math.PI / 180;
+        FOV = 40 * Math.PI / 180;
         WALL_COLOR = new Color(255, 240, 180);
         FLOOR_COLOR = new Color(150, 200, 130, 255);
         CEILING_COLOR = new Color(150, 200, 255);
-        WALL_HEIGHT = 1800;
+        WALL_HEIGHT = 2000;
         // initialize references
-        player =  world.getObjects(Player.class).get(0);
-        walls = ((Walls)world.getObjects(Walls.class).get(0)).getWalls();
+        ((Game)getWorld()).setGraphics(this);
+        player =  ((Game)getWorld()).getPlayer();
+        walls = ((Game)getWorld()).getWalls();
     }
     /**
      * Act - do whatever the Renderer wants to do. This method is called whenever
@@ -61,17 +62,21 @@ public class Renderer extends Actor
         {
             double angle = player.getRot() - FOV/2 + (double)x / WIDTH * FOV;
             double closestDist = Integer.MAX_VALUE;
-            for (int i = 1; i <= walls.length; i ++) // Loop through each wall and get a raycast to it.
+            for (int i = 1; i < walls.length; i ++) // Loop through each wall and get a raycast to it.
             {
-                double[] hitPt = castRay(player.getPos(), walls[i-1], walls[i%walls.length], angle);
+                if (walls[i] == null || walls[i-1] == null)
+                    continue;
+                double[] hitPt = castRay(player.getPos(), walls[i-1], walls[i], angle);
                 if (hitPt == null)
                     continue;
-                double dist = Math.sqrt(Math.pow(player.getPos()[0]-hitPt[0], 2) + Math.pow(player.getPos()[1]-hitPt[1], 2));
+
+                double actualDist = Math.sqrt(Math.pow(player.getPos()[0]-hitPt[0], 2) + Math.pow(player.getPos()[1]-hitPt[1], 2));
+                double dist = Math.cos((double)x / WIDTH * FOV) * actualDist;
                 if (dist < closestDist)
                     closestDist = dist;
             }    
             // Draw the closest point from the raycast
-            int v = -(int)(closestDist * 10);
+            int v = -(int)(closestDist * 3);
             int r = Math.clamp(WALL_COLOR.getRed()+v, 0, 255);
             int g = Math.clamp(WALL_COLOR.getGreen()+v, 0, 255);
             int b = Math.clamp(WALL_COLOR.getBlue()+v, 0, 255);
@@ -121,8 +126,8 @@ public class Renderer extends Actor
         int maxX = Math.max(pt1[0], pt2[0]);
         int minY = Math.min(pt1[1], pt2[1]);
         int maxY = Math.max(pt1[1], pt2[1]);
-        double roundX = Math.round(hitPt[0]*10000)/10000;
-        double roundY = Math.round(hitPt[1]*10000)/10000;
+        double roundX = (double)Math.round(hitPt[0]*10000)/10000;
+        double roundY = (double)Math.round(hitPt[1]*10000)/10000;
         if (roundX <= maxX && roundX >= minX && roundY <= maxY && roundY >= minY)
             return hitPt;
         return null;
