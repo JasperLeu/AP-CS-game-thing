@@ -49,6 +49,7 @@ public class Player extends Actor
     
     public void move()
     {
+        getCollision(((Game)getWorld()).getWalls());
         double tSpd = turnSpeed / 60;
         double mSpd = moveSpeed / 60;
         if (Greenfoot.isKeyDown("left"))
@@ -73,8 +74,9 @@ public class Player extends Actor
         }
     }
     
-    public double[] getCollision(double[][] walls)
+    public double[] getCollision(int[][] walls)
     {
+        double minDist = Double.MAX_VALUE;
         for (int i = 1; i < walls.length; i++)
         {
             if (walls[i] == null || walls[i-1] == null)
@@ -82,12 +84,14 @@ public class Player extends Actor
             double aSquared = Math.pow(walls[i-1][0]-x, 2)+Math.pow(walls[i-1][1]-y, 2);
             double b = Math.sqrt(Math.pow(walls[i][0]-x, 2)+Math.pow(walls[i][1]-y, 2));
             double c = Math.sqrt(Math.pow(walls[i-1][0]-walls[i][0], 2)+Math.pow(walls[i-1][1]-walls[i][1], 2));
-            double dist = b * Math.sin(Math.acos((Math.pow(b,2)+Math.pow(c,2)+aSquared) / (2*b*c)));
-            if (dist < radius)
-            {
-                double angle = Math.atan2(walls[i][1]-walls[i-1][1], walls[i][0]-walls[i-1][0]) - Math.PI/2;
-            }
+            double angle = Math.acos((Math.pow(b,2)+Math.pow(c,2)-aSquared) / (2*b*c));
+            double dist = b * Math.sin(angle);
+            if (b * Math.cos(angle) > c || b * Math.cos(angle) < 0)
+                dist = Math.min(b, Math.sqrt(aSquared));
+            if (dist < minDist)
+                minDist = dist;
         }
+        System.out.println(minDist);
         return null;
     }
 }

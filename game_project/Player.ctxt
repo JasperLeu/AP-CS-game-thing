@@ -14,5 +14,5 @@ comment5.target=double\ getRot()
 comment6.params=
 comment6.target=void\ move()
 comment7.params=walls
-comment7.target=double[]\ getCollision(double[][])
+comment7.target=double[]\ getCollision(int[][])
 numComments=8
