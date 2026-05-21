@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Renderer extends Actor
 {   
     private double FOV;
+    private int PIX_WIDTH;
     private int WALL_HEIGHT;
     private Color WALL_COLOR;
     private Color FLOOR_COLOR;
@@ -29,6 +30,7 @@ public class Renderer extends Actor
         FLOOR_COLOR = new Color(150, 200, 130, 255);
         CEILING_COLOR = new Color(150, 200, 255);
         WALL_HEIGHT = 2000;
+        PIX_WIDTH = 10;
         // initialize references
         ((Game)getWorld()).setGraphics(this);
         player =  ((Game)getWorld()).getPlayer();
@@ -67,7 +69,7 @@ public class Renderer extends Actor
     public void drawWalls()
     {
         GreenfootImage image = getWorld().getBackground();
-        for (int x = 0; x < WIDTH; x++)
+        for (int x = 0; x < WIDTH; x+=PIX_WIDTH)
         {
             double angle = player.getRot() - FOV/2 + (double)x / WIDTH * FOV;
             double closestDist = Integer.MAX_VALUE;
@@ -81,7 +83,10 @@ public class Renderer extends Actor
                 double dist = Math.cos((double)x / WIDTH * FOV) * actualDist;
                 if (dist < closestDist)
                     closestDist = dist;
-            }    
+            }  
+            
+             
+            
             // Draw the closest point from the raycast
             int v = -(int)(closestDist * 7);
             int r = (int)clamp(WALL_COLOR.getRed()+v, 0, 255);
@@ -92,7 +97,7 @@ public class Renderer extends Actor
             if (closestDist > 0.01)
                 h = (int)(WALL_HEIGHT / closestDist);
             if (closestDist < Integer.MAX_VALUE){
-                image.drawLine(WIDTH-x, HEIGHT/2-h/2, WIDTH-x, HEIGHT/2+h/2);
+                image.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2-h/2, PIX_WIDTH, h);
                 //image.drawLine(player.getX(), player.getY(), player.getX()+(int)(closestDist*10*Math.cos(angle)), player.getY()-(int)(closestDist*10*Math.sin(angle)));
             }
         }   
