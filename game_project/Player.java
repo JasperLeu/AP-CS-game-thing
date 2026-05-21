@@ -1,5 +1,5 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
-
+import java.util.ArrayList;
 /**
  * Write a description of class Player here.
  * 
@@ -12,6 +12,7 @@ public class Player extends Actor
      * Act - do whatever the Player wants to do. This method is called whenever
      * the 'Act' or 'Run' button gets pressed in the environment.
      */
+    private Vector pos;
     private double x;
     private double y;
     private double rot;
@@ -24,6 +25,7 @@ public class Player extends Actor
         super();
         moveSpeed = 3;
         turnSpeed = Math.PI/4;
+        pos = new Vector(0, 0);
     }
     protected void addedToWorld(World world)
     {
@@ -38,9 +40,9 @@ public class Player extends Actor
         // Add your action code here.
     }
     
-    public double[] getPos()
+    public Vector getPos()
     {
-        return new double[]{x, y};
+        return pos;
     }
     public double getRot()
     {
@@ -57,41 +59,51 @@ public class Player extends Actor
         if (Greenfoot.isKeyDown("right"))
             rot -= tSpd;
         if (Greenfoot.isKeyDown("w")){
-            x += mSpd * Math.cos(rot);
-            y += mSpd * Math.sin(rot);
+            pos.add(new Vector(mSpd * Math.cos(rot), mSpd * Math.sin(rot)));
         }
         if (Greenfoot.isKeyDown("s")){
-            x -= mSpd * Math.cos(rot);
-            y -= mSpd * Math.sin(rot);
+            pos.add(new Vector(-mSpd * Math.cos(rot), -mSpd * Math.sin(rot)));
         }
         if (Greenfoot.isKeyDown("a")){
-            x += mSpd * Math.cos(rot+Math.PI/2);
-            y += mSpd * Math.sin(rot+Math.PI/2);
+            pos.add(new Vector(mSpd * Math.cos(rot+Math.PI/2), mSpd * Math.sin(rot+Math.PI/2)));
         }
         if (Greenfoot.isKeyDown("d")){
-            x += mSpd * Math.cos(rot-Math.PI/2);
-            y += mSpd * Math.sin(rot-Math.PI/2);
+            pos.add(new Vector(-mSpd * Math.cos(rot+Math.PI/2), -mSpd * Math.sin(rot+Math.PI/2)));
         }
     }
     
-    public double[] getCollision(int[][] walls)
+    public Vector getCollision(ArrayList<Wall> walls)
     {
         double minDist = Double.MAX_VALUE;
-        for (int i = 1; i < walls.length; i++)
+        double dir = 0;
+        for (int i = 0; i < walls.size(); i++)
         {
-            if (walls[i] == null || walls[i-1] == null)
-                continue;
-            double aSquared = Math.pow(walls[i-1][0]-x, 2)+Math.pow(walls[i-1][1]-y, 2);
-            double b = Math.sqrt(Math.pow(walls[i][0]-x, 2)+Math.pow(walls[i][1]-y, 2));
-            double c = Math.sqrt(Math.pow(walls[i-1][0]-walls[i][0], 2)+Math.pow(walls[i-1][1]-walls[i][1], 2));
-            double angle = Math.acos((Math.pow(b,2)+Math.pow(c,2)-aSquared) / (2*b*c));
-            double dist = b * Math.sin(angle);
-            if (b * Math.cos(angle) > c || b * Math.cos(angle) < 0)
-                dist = Math.min(b, Math.sqrt(aSquared));
-            if (dist < minDist)
+            Vector wallVec = walls.get(i).getVector();
+            double angle = wallVec.getAngle(pos.minus(walls.get(i).getPt1()));
+            double distToPt1 = pos.getDist(walls.get(i).getPt1());
+            double distToPt2 = pos.getDist(walls.get(i).getPt2());
+            double wallLength = walls.get(i).getPt1().getDist(walls.get(i).getPt2());
+            double dist = distToPt1 * Math.sin(angle);
+            double posAlongWall = distToPt1 * Math.cos(angle);
+            if (posAlongWall > wallLength || posAlongWall < 0){
+                dist = Math.min(distToPt1, distToPt2);
+                if (dist < minDist)
+                {
+                    if (dist == distToPt1)
+                        dir = pos.minus(walls.get(i).getPt1()).getAngle();
+                    else
+                        dir = pos.minus(walls.get(i).getPt2()).getAngle();
+                }
+            }
+            else if (dist < minDist){
                 minDist = dist;
+                dir = wallVec.getAngle() + Math.PI/2;
+                if (wallVec.cross(pos.minus(walls.get(i).getPt1())) < 0)
+                    dir -= Math.PI;
+            }
         }
-        System.out.println(minDist);
+        if (minDist < radius)
+            pos.add((new Vector(dir)).times(radius-minDist));
         return null;
     }
 }

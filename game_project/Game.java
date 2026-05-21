@@ -1,4 +1,5 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and Mouse
+import java.util.ArrayList;
 /**
  * Write a description of class MyWorld here.
  * 
@@ -32,7 +33,7 @@ public class Game extends World
     {
         map = m;
     }
-    public int[][] getWalls()
+    public ArrayList<Wall> getWalls()
     {
         return map.getWalls();
     }
