@@ -25,12 +25,12 @@ public class Renderer extends Actor
         // Render Constants
         WIDTH = world.getWidth();
         HEIGHT = world.getHeight();
-        FOV = 40 * Math.PI / 180;
+        FOV = 50 * Math.PI / 180;
         WALL_COLOR = new Color(255, 255, 255);
         FLOOR_COLOR = new Color(150, 200, 130, 255);
         CEILING_COLOR = new Color(150, 200, 255);
-        WALL_HEIGHT = 2000;
-        PIX_WIDTH = 10;
+        WALL_HEIGHT = 3000;
+        PIX_WIDTH = 3;
         // initialize references
         ((Game)getWorld()).setGraphics(this);
         player =  ((Game)getWorld()).getPlayer();
@@ -73,6 +73,8 @@ public class Renderer extends Actor
         {
             double angle = player.getRot() - FOV/2 + (double)x / WIDTH * FOV;
             double closestDist = Integer.MAX_VALUE;
+            Vector closestHitPt = null;
+            Wall closestWall = null;
             for (int i = 0; i < walls.size(); i ++) // Loop through each wall and get a raycast to it.
             {
                 Vector hitPt = castRay(player.getPos(), walls.get(i), angle);
@@ -80,25 +82,31 @@ public class Renderer extends Actor
                     continue;
 
                 double actualDist = player.getPos().getDist(hitPt);
-                double dist = Math.cos((double)x / WIDTH * FOV) * actualDist;
-                if (dist < closestDist)
+                //double dist = Math.cos((double)x / WIDTH * FOV) * actualDist;
+                double dist = actualDist;
+                if (dist < closestDist){
+                    closestHitPt = hitPt;
                     closestDist = dist;
+                    closestWall = walls.get(i);
+                }
             }  
             
-             
-            
-            // Draw the closest point from the raycast
-            int v = -(int)(closestDist * 7);
-            int r = (int)clamp(WALL_COLOR.getRed()+v, 0, 255);
-            int g = (int)clamp(WALL_COLOR.getGreen()+v, 0, 255);
-            int b = (int)clamp(WALL_COLOR.getBlue()+v, 0, 255);
-            image.setColor(new Color(r, g, b));
-            int h = HEIGHT;
-            if (closestDist > 0.01)
-                h = (int)(WALL_HEIGHT / closestDist);
-            if (closestDist < Integer.MAX_VALUE){
-                image.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2-h/2, PIX_WIDTH, h);
-                //image.drawLine(player.getX(), player.getY(), player.getX()+(int)(closestDist*10*Math.cos(angle)), player.getY()-(int)(closestDist*10*Math.sin(angle)));
+            if (closestDist < Integer.MAX_VALUE)
+            {
+                double percent = closestWall.getPt1().getDist(closestHitPt) / (Math.tan(FOV/2)/WIDTH * WALL_HEIGHT );
+                Color[] textureColors = closestWall.sampleWallTexture(percent);
+                int h = (int)(WALL_HEIGHT / closestDist);
+                // Draw the closest point from the raycast
+                for (int y = HEIGHT/2-h/2; y < HEIGHT/2+h/2; y+=PIX_WIDTH)
+                {
+                    int v = -(int)(closestDist*2);
+                    Color currColor = textureColors[(int)((y-HEIGHT/2+h/2)/(double)h*textureColors.length)];
+                    int r = (int)clamp(currColor.getRed()+v, 0, 255);
+                    int g = (int)clamp(currColor.getGreen()+v, 0, 255);
+                    int b = (int)clamp(currColor.getBlue()+v, 0, 255);
+                    image.setColor(new Color(r, g, b));
+                    image.fillRect(WIDTH-x-PIX_WIDTH, y, PIX_WIDTH, PIX_WIDTH);
+                }
             }
         }   
     }

@@ -1,3 +1,5 @@
+import greenfoot.*;
+
 /**
  * Write a description of class Wall here.
  * 
@@ -10,13 +12,25 @@ public class Wall
     private double y1;
     private double x2;
     private double y2;
+    private GreenfootImage texture;
     
-    public Wall(double x1, double y1, double x2, double y2)
+    public Wall(double x1, double y1, double x2, double y2, GreenfootImage tex)
     {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
+        texture = tex;
+    }
+    
+    public Color[] sampleWallTexture(double percent)
+    {
+        Color[] colors = new Color[texture.getHeight()];
+        for (int y = 0; y < texture.getWidth(); y++)
+        {
+            colors[y] = texture.getColorAt((int)(percent*texture.getWidth())%(texture.getWidth()), y);
+        }
+        return colors;
     }
     
     public boolean isVertical()

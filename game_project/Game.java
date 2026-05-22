@@ -11,13 +11,27 @@ public class Game extends World
     private Renderer graphics;
     private Map map;
     private Player player;
+    private double deltaTime;
+    private double lastTime;
     
     public Game()
     {   
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
         super(600, 400, 1);
-        Greenfoot.setSpeed(60);
+        lastTime = System.currentTimeMillis();
+        Greenfoot.setSpeed(100);
         prepare();
+    }
+    
+    public void act()
+    {
+        deltaTime = (System.currentTimeMillis()-lastTime)/1000.0;
+        lastTime = System.currentTimeMillis();
+    }
+    
+    public double getDeltaTime()
+    {
+        return deltaTime;
     }
     
     public void setGraphics(Renderer r)
@@ -32,6 +46,10 @@ public class Game extends World
     public void setMap(Map m)
     {
         map = m;
+    }
+    public Map getMap()
+    {
+        return map;
     }
     public ArrayList<Wall> getWalls()
     {
