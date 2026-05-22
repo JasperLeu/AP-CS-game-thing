@@ -99,6 +99,8 @@ public class Renderer extends Actor
                 // Draw the closest point from the raycast
                 for (int y = HEIGHT/2-h/2; y < HEIGHT/2+h/2; y+=PIX_WIDTH)
                 {
+                    if (y > HEIGHT || y < -PIX_WIDTH)
+                        continue;
                     int v = -(int)(closestDist*2);
                     Color currColor = textureColors[(int)((y-HEIGHT/2+h/2)/(double)h*textureColors.length)];
                     int r = (int)clamp(currColor.getRed()+v, 0, 255);
