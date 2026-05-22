@@ -11,7 +11,6 @@ public class Renderer extends Actor
     private double FOV;
     private int PIX_WIDTH;
     private int WALL_HEIGHT;
-    private Color WALL_COLOR;
     private Color FLOOR_COLOR;
     private Color CEILING_COLOR;
     
@@ -26,11 +25,10 @@ public class Renderer extends Actor
         WIDTH = world.getWidth();
         HEIGHT = world.getHeight();
         FOV = 50 * Math.PI / 180;
-        WALL_COLOR = new Color(255, 255, 255);
-        FLOOR_COLOR = new Color(150, 200, 130, 255);
-        CEILING_COLOR = new Color(150, 200, 255);
+        FLOOR_COLOR = new Color(140, 140, 140, 255);
+        CEILING_COLOR = new Color(90, 90, 90);
         WALL_HEIGHT = 3000;
-        PIX_WIDTH = 3;
+        PIX_WIDTH = 5;
         // initialize references
         ((Game)getWorld()).setGraphics(this);
         player =  ((Game)getWorld()).getPlayer();

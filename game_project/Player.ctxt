@@ -14,5 +14,5 @@ comment5.target=double\ getRot()
 comment6.params=
 comment6.target=void\ move()
 comment7.params=walls
-comment7.target=Vector\ getCollision(java.util.ArrayList)
+comment7.target=boolean\ getCollision(java.util.ArrayList)
 numComments=8

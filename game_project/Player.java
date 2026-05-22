@@ -18,12 +18,12 @@ public class Player extends Actor
     private double rot;
     private double moveSpeed;
     private double turnSpeed;
-    private double radius = .5;
+    private double radius = .8;
     
     public Player()
     {
         super();
-        moveSpeed = 10;
+        moveSpeed = 15;
         turnSpeed = Math.PI;
         pos = new Vector(0, 0);
     }
@@ -52,9 +52,10 @@ public class Player extends Actor
     public void move()
     {
         Game game = (Game)getWorld();
-        getCollision(game.getWalls());
         double tSpd = turnSpeed * game.getDeltaTime();
         double mSpd = moveSpeed * game.getDeltaTime();
+        if (getCollision(game.getWalls()) && mSpd > radius)
+            mSpd = radius;
         if (Greenfoot.isKeyDown("left"))
             rot += tSpd;
         if (Greenfoot.isKeyDown("right"))
@@ -73,7 +74,7 @@ public class Player extends Actor
         }
     }
     
-    public Vector getCollision(ArrayList<Wall> walls)
+    public boolean getCollision(ArrayList<Wall> walls)
     {
         double minDist = Double.MAX_VALUE;
         double dir = 0;
@@ -103,8 +104,10 @@ public class Player extends Actor
                     dir -= Math.PI;
             }
         }
-        if (minDist < radius)
+        if (minDist < radius){
             pos.add((new Vector(dir)).times(radius-minDist));
-        return null;
+            return true;
+        }
+        return false;
     }
 }
