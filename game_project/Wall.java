@@ -12,7 +12,8 @@ public class Wall
     private double y1;
     private double x2;
     private double y2;
-    private static GreenfootImage texture = null;
+    private double height; 
+    private GreenfootImage texture = null;
     
     public Wall(World w, double x1, double y1, double x2, double y2)
     {
@@ -20,6 +21,7 @@ public class Wall
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
+        height = 5;
         if (texture == null)
             texture = ((Game)w).setupTexture("brick.jpg", 64);
     }
@@ -58,6 +60,11 @@ public class Wall
     public double getY2()
     {
         return y2;
+    }
+    
+    public double getHeight()
+    {
+        return height;
     }
     
     public Vector getVector()

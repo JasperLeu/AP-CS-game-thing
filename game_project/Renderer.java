@@ -11,9 +11,6 @@ public class Renderer extends Actor
 {   
     private double FOV;
     private int PIX_WIDTH;
-    private int WALL_HEIGHT;
-    private Color FLOOR_COLOR;
-    private Color CEILING_COLOR;
     
     private Player player;
     private ArrayList<Wall> walls;
@@ -22,13 +19,11 @@ public class Renderer extends Actor
     
     protected void addedToWorld(World world)
     {
+        setImage(new GreenfootImage(world.getWidth(), world.getHeight()));
         // Render Constants
         WIDTH = world.getWidth();
         HEIGHT = world.getHeight();
         FOV = 50 * Math.PI / 180;
-        FLOOR_COLOR = new Color(140, 140, 140, 255);
-        CEILING_COLOR = new Color(90, 90, 90);
-        WALL_HEIGHT = 3000;
         PIX_WIDTH = 3;
         // initialize references
         ((Game)getWorld()).setGraphics(this);
@@ -47,12 +42,12 @@ public class Renderer extends Actor
     
     public void drawBackground()
     {
-        GreenfootImage image = getWorld().getBackground();
+        GreenfootImage image = getImage();
         image.setColor(new Color(255, 255, 255));
         image.fill();
-        image.setColor(FLOOR_COLOR);
+        image.setColor(((Game)getWorld()).getMap().getFloorColor());
         image.fillRect(0, HEIGHT/2, WIDTH, HEIGHT/2);
-        image.setColor(CEILING_COLOR);
+        image.setColor(((Game)getWorld()).getMap().getCeilingColor());
         image.fillRect(0, 0, WIDTH, HEIGHT/2);
     }
     
@@ -67,7 +62,7 @@ public class Renderer extends Actor
     
     public void drawWalls()
     {
-        GreenfootImage image = getWorld().getBackground();
+        GreenfootImage screen = getImage();
         List<Enemy> allEnemies = getWorld().getObjects(Enemy.class);
         for (int x = 0; x < WIDTH; x+=PIX_WIDTH)
         {
@@ -113,9 +108,10 @@ public class Renderer extends Actor
             }
             int maxHeight = 0;
             Color[] wallColors = new Color[0];
-            int wallH = (int)(WALL_HEIGHT / closestWallDist);
+            int wallH = 0;
             if (closestWall != null){
-                double percent = closestWall.getPt1().getDist(closestHitPt) / (Math.tan(FOV/2)/WIDTH*2 * WALL_HEIGHT);
+                wallH = (int)(WIDTH / Math.tan(FOV/2)/2 * closestWall.getHeight() / closestWallDist);
+                double percent = closestWall.getPt1().getDist(closestHitPt) / (closestWall.getHeight());
                 wallColors = ((Game)getWorld()).sampleTexture(closestWall.getTexture(), percent);
                 maxHeight = wallH;
             }
@@ -168,8 +164,8 @@ public class Renderer extends Actor
                     int r = (int)clamp(currColor.getRed()+tint, 0, 255);
                     int g = (int)clamp(currColor.getGreen()+tint, 0, 255);
                     int b = (int)clamp(currColor.getBlue()+tint, 0, 255);
-                    image.setColor(new Color(r, g, b));
-                    image.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2+y, PIX_WIDTH, PIX_WIDTH);
+                    screen.setColor(new Color(r, g, b));
+                    screen.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2+y, PIX_WIDTH, PIX_WIDTH);
                 }
             }
         }   

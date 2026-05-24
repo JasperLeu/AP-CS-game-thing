@@ -17,12 +17,11 @@ public class Game extends World
     public Game()
     {   
         // Create a new world with 600x400 cells with a cell size of 1x1 pixels.
-        super(600, 400, 1);
+        super(1000, 600, 1);
         lastTime = System.currentTimeMillis();
         Greenfoot.setSpeed(100);
         prepare();
-        addObject(new Enemy(-5, -5), 550, 200);
-        addObject(new Enemy(2, 2), 550, 200);
+        setPaintOrder(Animation.class, Renderer.class);
     }
     
     public void act()
@@ -111,11 +110,11 @@ public class Game extends World
      */
     private void prepare()
     {
-        Player player = new Player();
-        addObject(player,550,50);
-        Map map = new Map();
-        addObject(map,580,380);
+        addObject(new Player(),550,50);
+        addObject(new Map(),580,380);
+        addObject(new Enemy(-5, -5), 550, 200);
+        addObject(new Enemy(2, 2), 550, 200);
         Renderer renderer = new Renderer();
-        addObject(renderer,550,350);
+        addObject(renderer,getWidth()/2,getHeight()/2);
     }
 }

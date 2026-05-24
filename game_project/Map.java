@@ -11,11 +11,16 @@ public class Map extends Actor
 {
     private ArrayList<Wall> walls;
     private int wallTexWidth;
+    private Color FLOOR_COLOR;
+    private Color CEILING_COLOR;
     
     protected void addedToWorld(World world)
     {
         ((Game)world).setMap(this);
         walls = new ArrayList<Wall>();
+        
+        FLOOR_COLOR = new Color(140, 140, 140, 255);
+        CEILING_COLOR = new Color(90, 90, 90);
         
         double[] pts = {-10, -10, -10, 7, 5, 7, 5, 0, 8, 0, 8, 20, 15, 20, 15, -10, -10, -10};
         // add all of the walls
@@ -25,6 +30,14 @@ public class Map extends Actor
         }
     }
     
+    public Color getFloorColor()
+    {
+        return FLOOR_COLOR;
+    }
+    public Color getCeilingColor()
+    {
+        return CEILING_COLOR;
+    }
     public ArrayList<Wall> getWalls()
     {
         return walls;
