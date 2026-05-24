@@ -17,6 +17,8 @@ public class Renderer extends Actor
     private int WIDTH;
     private int HEIGHT;
     
+    private Object thingLookedAt = null;
+    
     protected void addedToWorld(World world)
     {
         setImage(new GreenfootImage(world.getWidth(), world.getHeight()));
@@ -132,6 +134,8 @@ public class Renderer extends Actor
                 if (closestWall != null && Math.abs(y) < wallH / 2)
                 {
                     tint = (int)(closestWallDist);
+                    if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
+                        thingLookedAt = closestWall;
                     if (closestEnemy != null && Math.abs(y) < enemyH/2)
                     {
                         if (closestEnemyDist > closestWallDist)
@@ -139,6 +143,8 @@ public class Renderer extends Actor
                         if (closestEnemyDist <= closestWallDist || currColor!=null && currColor.getAlpha() == 0){
                             currColor = enemyColors[(int)((y+enemyH/2)/(double)enemyH*enemyColors.length)];
                             tint = (int)(closestEnemyDist);
+                            if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
+                                thingLookedAt = closestEnemy;
                             if (currColor.getAlpha() == 0)
                             {
                                 currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
@@ -153,6 +159,8 @@ public class Renderer extends Actor
                 else if (closestEnemy != null && Math.abs(y) < enemyH/2)
                 {
                     tint = (int)(closestEnemyDist);
+                    if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
+                        thingLookedAt = closestEnemy;
                     currColor = enemyColors[(int)((y+enemyH/2)/(double)enemyH*enemyColors.length)];
                     if (currColor.getAlpha() == 0)
                         currColor = null;
@@ -166,6 +174,10 @@ public class Renderer extends Actor
                     int b = (int)clamp(currColor.getBlue()+tint, 0, 255);
                     screen.setColor(new Color(r, g, b));
                     screen.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2+y, PIX_WIDTH, PIX_WIDTH);
+                }
+                else if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
+                {
+                    thingLookedAt = null;
                 }
             }
         }   
@@ -218,5 +230,10 @@ public class Renderer extends Actor
         if (angle < 0)
             angle += ((int)(angle/-Math.PI/2)+1) * Math.PI*2;
         return angle % 360;
+    }
+    
+    public Object getLookedAt()
+    {
+        return thingLookedAt;
     }
 }

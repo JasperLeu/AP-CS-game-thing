@@ -72,6 +72,28 @@ public class Game extends World
         }
         return newImage;
     }
+    public GreenfootImage tintImage(GreenfootImage img, Color tint)
+    {
+        GreenfootImage newImage = new GreenfootImage(img.getWidth(), img.getHeight());
+        for (int x = 0; x < newImage.getWidth(); x++)
+        {
+            for (int y = 0; y < newImage.getHeight(); y++)
+            {
+                Color c = img.getColorAt(x, y);
+                int r = c.getRed() + tint.getRed();
+                if (r > 255)
+                    r = 255;
+                int g = c.getGreen() + tint.getGreen();
+                if (g > 255)
+                    g = 255;
+                int b = c.getBlue() + tint.getBlue();
+                if (b > 255)
+                    b = 255;
+                newImage.setColorAt(x, y, new Color(r,g,b));
+            }
+        }
+        return newImage;
+    }
     
     public void setGraphics(Renderer r)
     {

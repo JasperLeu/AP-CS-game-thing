@@ -16,4 +16,6 @@ comment6.params=pos\ wall\ angle
 comment6.target=Vector\ castRay(Vector,\ Wall,\ double)
 comment7.params=angle
 comment7.target=double\ normalizeAngle(double)
-numComments=8
+comment8.params=
+comment8.target=java.lang.Object\ getLookedAt()
+numComments=9

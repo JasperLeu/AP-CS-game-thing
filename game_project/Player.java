@@ -58,8 +58,12 @@ public class Player extends Actor
         {
             if (Greenfoot.getMouseInfo().getButton() == 1)
             {
+                // code for attacking
                 armAnim.play();
                 isAttacking = true;
+                Object lookedAt = ((Game)getWorld()).getGraphics().getLookedAt();
+                if (lookedAt != null && lookedAt.getClass() == Enemy.class)
+                    ((Enemy)lookedAt).playHitAnimation();
             }
         }
         if (Greenfoot.mouseClicked(null))
