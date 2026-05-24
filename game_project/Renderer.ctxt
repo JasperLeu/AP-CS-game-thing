@@ -14,4 +14,6 @@ comment5.params=
 comment5.target=void\ drawWalls()
 comment6.params=pos\ wall\ angle
 comment6.target=Vector\ castRay(Vector,\ Wall,\ double)
-numComments=7
+comment7.params=angle
+comment7.target=double\ normalizeAngle(double)
+numComments=8

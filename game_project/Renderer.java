@@ -98,7 +98,7 @@ public class Renderer extends Actor
             {
                 Vector toEnemy = enemy.getPos().minus(player.getPos());
                 double distToEnemy = toEnemy.magnitude();
-                double angleToEnemy = angle - toEnemy.getAngle();
+                double angleToEnemy = normalizeAngle(toEnemy.getAngle() - angle);
                 if(Math.abs((angleToEnemy+Math.PI)%(Math.PI*2)-Math.PI) > Math.PI/2)
                     continue;
                 double ptOnEnemy = distToEnemy * Math.sin(angleToEnemy);
@@ -130,20 +130,47 @@ public class Renderer extends Actor
             // Draw the closest point from the raycast
             for (int y = -maxHeight/2; y < maxHeight/2; y+=PIX_WIDTH)
             {
-                Color currColor;
-                if (closestWall != null && Math.abs(y) <= wallH / 2 && (closestEnemy == null || Math.abs(y) > enemyH / 2 || closestEnemyDist > closestWallDist))
+                // Sooo, all this was supposed to check for transparent pixels but it doesnt work when enemies overlap :(
+                Color currColor = null;
+                int tint = 0;
+                if (closestWall != null && Math.abs(y) < wallH / 2)
                 {
-                    currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
+                    tint = (int)(closestWallDist);
+                    if (closestEnemy != null && Math.abs(y) < enemyH/2)
+                    {
+                        if (closestEnemyDist > closestWallDist)
+                            currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
+                        if (closestEnemyDist <= closestWallDist || currColor!=null && currColor.getAlpha() == 0){
+                            currColor = enemyColors[(int)((y+enemyH/2)/(double)enemyH*enemyColors.length)];
+                            tint = (int)(closestEnemyDist);
+                            if (currColor.getAlpha() == 0)
+                            {
+                                currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
+                                if (currColor.getAlpha() == 0)
+                                    currColor = null;
+                            }
+                        }
+                    }
+                    else
+                        currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];         
                 }
-                else
+                else if (closestEnemy != null && Math.abs(y) < enemyH/2)
                 {
+                    tint = (int)(closestEnemyDist);
                     currColor = enemyColors[(int)((y+enemyH/2)/(double)enemyH*enemyColors.length)];
+                    if (currColor.getAlpha() == 0)
+                        currColor = null;
                 }
-                int r = (int)clamp(currColor.getRed(), 0, 255);
-                int g = (int)clamp(currColor.getGreen(), 0, 255);
-                int b = (int)clamp(currColor.getBlue(), 0, 255);
-                image.setColor(new Color(r, g, b));
-                image.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2+y, PIX_WIDTH, PIX_WIDTH);
+                
+                if (currColor != null)
+                {
+                    tint *= -2;
+                    int r = (int)clamp(currColor.getRed()+tint, 0, 255);
+                    int g = (int)clamp(currColor.getGreen()+tint, 0, 255);
+                    int b = (int)clamp(currColor.getBlue()+tint, 0, 255);
+                    image.setColor(new Color(r, g, b));
+                    image.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2+y, PIX_WIDTH, PIX_WIDTH);
+                }
             }
         }   
     }
@@ -188,5 +215,12 @@ public class Renderer extends Actor
         if (roundX <= maxX && roundX >= minX && roundY <= maxY && roundY >= minY)
             return hitPt;
         return null;
+    }
+    
+    public double normalizeAngle(double angle)
+    {
+        if (angle < 0)
+            angle += ((int)(angle/-Math.PI/2)+1) * Math.PI*2;
+        return angle % 360;
     }
 }

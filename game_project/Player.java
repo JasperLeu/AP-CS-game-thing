@@ -18,26 +18,52 @@ public class Player extends Actor
     private double rot;
     private double moveSpeed;
     private double turnSpeed;
+    private int lastMousePos;
+    private double lastMouseInput;
     private double radius = 1;
+    
+    private Animation armAnim;
+    private boolean isAttacking = false;
     
     public Player()
     {
         super();
         moveSpeed = 15;
-        turnSpeed = Math.PI;
+        turnSpeed = 2;
         pos = new Vector(0, 0);
     }
     protected void addedToWorld(World world)
     {
         ((Game)world).setPlayer(this);
+        armAnim = new Animation(new String[]{
+            "frame1.png", 
+            "frame2.png", 
+            "frame3.png", 
+            "frame4.png"}, 15);
+        world.addObject(armAnim, world.getWidth()/2, world.getHeight()*4/7);
     }
     
     public void act()
     {
         move();
-        //setLocation((int)(x*10+200), (int)(-y*10+200));
-        setRotation((int)(-rot * 180 / Math.PI)+90);
+        turn();
+        checkAttack();
         // Add your action code here.
+    }
+    
+    public void checkAttack()
+    {
+        MouseInfo input = Greenfoot.getMouseInfo();
+        if (!isAttacking && !armAnim.inAnimation() && input != null)
+        {
+            if (Greenfoot.getMouseInfo().getButton() == 1)
+            {
+                armAnim.play();
+                isAttacking = true;
+            }
+        }
+        if (Greenfoot.mouseClicked(null))
+            isAttacking = false;
     }
     
     public Vector getPos()
@@ -52,27 +78,59 @@ public class Player extends Actor
     public void move()
     {
         Game game = (Game)getWorld();
-        double tSpd = turnSpeed * game.getDeltaTime();
         double mSpd = moveSpeed * game.getDeltaTime();
+        Vector movementVec = new Vector(0, 0);
         if (getCollision(game.getWalls()) && mSpd > radius)
             mSpd = radius;
-        if (Greenfoot.isKeyDown("left"))
-            rot += tSpd;
-        if (Greenfoot.isKeyDown("right"))
-            rot -= tSpd;
         if (Greenfoot.isKeyDown("w")){
-            pos.add(new Vector(mSpd * Math.cos(rot), mSpd * Math.sin(rot)));
+            movementVec.add(new Vector(mSpd * Math.cos(rot), mSpd * Math.sin(rot)));
         }
         if (Greenfoot.isKeyDown("s")){
-            pos.add(new Vector(-mSpd * Math.cos(rot), -mSpd * Math.sin(rot)));
+            movementVec.add(new Vector(-mSpd * Math.cos(rot), -mSpd * Math.sin(rot)));
         }
         if (Greenfoot.isKeyDown("a")){
-            pos.add(new Vector(mSpd * Math.cos(rot+Math.PI/2), mSpd * Math.sin(rot+Math.PI/2)));
+            movementVec.add(new Vector(mSpd * Math.cos(rot+Math.PI/2), mSpd * Math.sin(rot+Math.PI/2)));
         }
         if (Greenfoot.isKeyDown("d")){
-            pos.add(new Vector(-mSpd * Math.cos(rot+Math.PI/2), -mSpd * Math.sin(rot+Math.PI/2)));
+            movementVec.add(new Vector(-mSpd * Math.cos(rot+Math.PI/2), -mSpd * Math.sin(rot+Math.PI/2)));
         }
+        applyMovement(movementVec);
     }
+    public void applyMovement(Vector moveVector)
+    {
+        Renderer r = ((Game)getWorld()).getGraphics();
+        Vector closestHit = null;
+        double closestDist = Double.MAX_VALUE;
+        double angle = moveVector.getAngle();
+        for (Wall w : ((Game)getWorld()).getWalls())
+        {
+            Vector hit = r.castRay(pos, w, angle);
+            if (hit == null)
+                continue;
+            double dist = hit.getDist(pos);
+            if (dist < closestDist){
+                closestDist = dist;
+                closestHit = hit;
+            }
+        }
+        if (closestHit != null && closestDist <= moveVector.magnitude()){
+            moveVector.normalize();
+            moveVector.multiply(closestDist - radius);
+        }
+        pos.add(moveVector);
+        getCollision(((Game)getWorld()).getWalls());
+    }
+
+    
+    public void turn()
+    {
+        MouseInfo input = Greenfoot.getMouseInfo();
+        if (input == null)
+            return;
+        rot += (input.getX()-lastMousePos)*-turnSpeed/(double)100;
+        lastMousePos = input.getX();
+    }
+    
     
     public boolean getCollision(ArrayList<Wall> walls)
     {

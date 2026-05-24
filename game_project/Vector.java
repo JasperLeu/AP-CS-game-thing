@@ -55,6 +55,11 @@ public class Vector
     {
         return new Vector(x * fac, y * fac);
     }
+    public void multiply(double fac)
+    {
+        x *= fac;
+        y*= fac;
+    }
     
     public void normalize()
     {

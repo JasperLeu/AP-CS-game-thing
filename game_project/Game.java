@@ -60,6 +60,20 @@ public class Game extends World
         return colors;
     }
     
+    public GreenfootImage rescaleImage(GreenfootImage img, int newWidth)
+    {
+        double factor = (double)newWidth / img.getWidth();
+        GreenfootImage newImage = new GreenfootImage(newWidth, (int)(img.getHeight()*factor));
+        for (int x = 0; x < newImage.getWidth(); x++)
+        {
+            for (int y = 0; y < newImage.getHeight(); y++)
+            {
+                newImage.setColorAt(x, y, img.getColorAt((int)(x/factor), (int)(y/factor)));
+            }
+        }
+        return newImage;
+    }
+    
     public void setGraphics(Renderer r)
     {
         graphics = r;
