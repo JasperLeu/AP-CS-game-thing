@@ -1,15 +1,36 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
 
-/**
- * Write a description of class Enemy here.
- * 
- * @author (your name) 
- * @version (a version number or a date)
- */
 public class Enemy extends Actor
 {
-    public void act()
+    private Vector pos;
+    private static GreenfootImage texture = null;
+    private static final double size = 4;
+    
+    public Enemy(double x, double y)
     {
-        // Add your action code here.
+        super();
+        pos = new Vector(x, y);
     }
+    
+    protected void addedToWorld(World world)
+    {
+        if (texture == null)
+            texture = ((Game)world).setupTexture("guy.jpg", 256);
+    }
+    
+    public GreenfootImage getTexture()
+    {
+        return texture;
+    }
+    
+    public Vector getPos()
+    {
+        return pos;
+    }
+    
+    public double getSize()
+    {
+        return size;
+    }
+    
 }

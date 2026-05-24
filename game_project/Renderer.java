@@ -1,5 +1,6 @@
 import greenfoot.*;  // (Wimporld, Actor, GreenfootImage, Greenfoot and MouseInfo)
 import java.util.ArrayList;
+import java.util.List;
 /**
  * Write a description of class Renderer here.
  * 
@@ -28,7 +29,7 @@ public class Renderer extends Actor
         FLOOR_COLOR = new Color(140, 140, 140, 255);
         CEILING_COLOR = new Color(90, 90, 90);
         WALL_HEIGHT = 3000;
-        PIX_WIDTH = 5;
+        PIX_WIDTH = 3;
         // initialize references
         ((Game)getWorld()).setGraphics(this);
         player =  ((Game)getWorld()).getPlayer();
@@ -67,10 +68,11 @@ public class Renderer extends Actor
     public void drawWalls()
     {
         GreenfootImage image = getWorld().getBackground();
+        List<Enemy> allEnemies = getWorld().getObjects(Enemy.class);
         for (int x = 0; x < WIDTH; x+=PIX_WIDTH)
         {
             double angle = player.getRot() - FOV/2 + (double)x / WIDTH * FOV;
-            double closestDist = Integer.MAX_VALUE;
+            double closestWallDist = Integer.MAX_VALUE;
             Vector closestHitPt = null;
             Wall closestWall = null;
             for (int i = 0; i < walls.size(); i ++) // Loop through each wall and get a raycast to it.
@@ -82,31 +84,66 @@ public class Renderer extends Actor
                 double actualDist = player.getPos().getDist(hitPt);
                 //double dist = Math.cos((double)x / WIDTH * FOV) * actualDist;
                 double dist = actualDist;
-                if (dist < closestDist){
+                if (dist < closestWallDist){
                     closestHitPt = hitPt;
-                    closestDist = dist;
+                    closestWallDist = dist;
                     closestWall = walls.get(i);
                 }
-            }  
-            
-            if (closestDist < Integer.MAX_VALUE)
+            }
+            // Loop through enemies and find all at this pixel
+            double closestEnemyDist = Double.MAX_VALUE;
+            Enemy closestEnemy = null;
+            double enemyTexturePos = 0; // percent (0->1) of where on the enemy sprite was hit;
+            for (Enemy enemy : allEnemies)
             {
-                double percent = closestWall.getPt1().getDist(closestHitPt) / (Math.tan(FOV/2)/WIDTH * WALL_HEIGHT );
-                Color[] textureColors = closestWall.sampleWallTexture(percent);
-                int h = (int)(WALL_HEIGHT / closestDist);
-                // Draw the closest point from the raycast
-                for (int y = HEIGHT/2-h/2; y < HEIGHT/2+h/2; y+=PIX_WIDTH)
+                Vector toEnemy = enemy.getPos().minus(player.getPos());
+                double distToEnemy = toEnemy.magnitude();
+                double angleToEnemy = angle - toEnemy.getAngle();
+                if(Math.abs((angleToEnemy+Math.PI)%(Math.PI*2)-Math.PI) > Math.PI/2)
+                    continue;
+                double ptOnEnemy = distToEnemy * Math.sin(angleToEnemy);
+                if (Math.abs(ptOnEnemy) > enemy.getSize()/2)
+                    continue;
+                if (distToEnemy < closestEnemyDist)
                 {
-                    if (y > HEIGHT || y < -PIX_WIDTH)
-                        continue;
-                    int v = -(int)(closestDist*2);
-                    Color currColor = textureColors[(int)((y-HEIGHT/2+h/2)/(double)h*textureColors.length)];
-                    int r = (int)clamp(currColor.getRed()+v, 0, 255);
-                    int g = (int)clamp(currColor.getGreen()+v, 0, 255);
-                    int b = (int)clamp(currColor.getBlue()+v, 0, 255);
-                    image.setColor(new Color(r, g, b));
-                    image.fillRect(WIDTH-x-PIX_WIDTH, y, PIX_WIDTH, PIX_WIDTH);
+                    closestEnemyDist = distToEnemy;
+                    closestEnemy = enemy;
+                    enemyTexturePos = (ptOnEnemy + enemy.getSize()/2) / enemy.getSize();
                 }
+            }
+            int maxHeight = 0;
+            Color[] wallColors = new Color[0];
+            int wallH = (int)(WALL_HEIGHT / closestWallDist);
+            if (closestWall != null){
+                double percent = closestWall.getPt1().getDist(closestHitPt) / (Math.tan(FOV/2)/WIDTH*2 * WALL_HEIGHT);
+                wallColors = ((Game)getWorld()).sampleTexture(closestWall.getTexture(), percent);
+                maxHeight = wallH;
+            }
+            int enemyH = 0;
+            Color[] enemyColors = new Color[0];
+            if (closestEnemy != null){
+                enemyH = (int)(WIDTH / Math.tan(FOV/2)/2 * closestEnemy.getSize() / closestEnemyDist);
+                enemyColors = ((Game)getWorld()).sampleTexture(closestEnemy.getTexture(), enemyTexturePos);
+                if (enemyH > maxHeight)
+                    maxHeight = enemyH;
+            }
+            // Draw the closest point from the raycast
+            for (int y = -maxHeight/2; y < maxHeight/2; y+=PIX_WIDTH)
+            {
+                Color currColor;
+                if (closestWall != null && Math.abs(y) <= wallH / 2 && (closestEnemy == null || Math.abs(y) > enemyH / 2 || closestEnemyDist > closestWallDist))
+                {
+                    currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
+                }
+                else
+                {
+                    currColor = enemyColors[(int)((y+enemyH/2)/(double)enemyH*enemyColors.length)];
+                }
+                int r = (int)clamp(currColor.getRed(), 0, 255);
+                int g = (int)clamp(currColor.getGreen(), 0, 255);
+                int b = (int)clamp(currColor.getBlue(), 0, 255);
+                image.setColor(new Color(r, g, b));
+                image.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2+y, PIX_WIDTH, PIX_WIDTH);
             }
         }   
     }

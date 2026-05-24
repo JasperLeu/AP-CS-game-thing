@@ -18,7 +18,7 @@ public class Player extends Actor
     private double rot;
     private double moveSpeed;
     private double turnSpeed;
-    private double radius = .8;
+    private double radius = 1;
     
     public Player()
     {

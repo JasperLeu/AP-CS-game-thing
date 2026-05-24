@@ -1,9 +1,7 @@
 #BlueJ class context
 comment0.target=Map
-comment1.params=
-comment1.target=Map()
-comment2.params=world
-comment2.target=void\ addedToWorld(greenfoot.World)
-comment3.params=
-comment3.target=java.util.ArrayList\ getWalls()
-numComments=4
+comment1.params=world
+comment1.target=void\ addedToWorld(greenfoot.World)
+comment2.params=
+comment2.target=java.util.ArrayList\ getWalls()
+numComments=3

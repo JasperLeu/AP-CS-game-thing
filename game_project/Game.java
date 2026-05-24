@@ -21,6 +21,8 @@ public class Game extends World
         lastTime = System.currentTimeMillis();
         Greenfoot.setSpeed(100);
         prepare();
+        addObject(new Enemy(-5, -5), 550, 200);
+        addObject(new Enemy(2, 2), 550, 200);
     }
     
     public void act()
@@ -32,6 +34,30 @@ public class Game extends World
     public double getDeltaTime()
     {
         return deltaTime;
+    }
+    
+    public GreenfootImage setupTexture(String imgName, int resolution)
+    {
+        GreenfootImage newTexture = new GreenfootImage(resolution, resolution);
+        GreenfootImage originalTex = new GreenfootImage(imgName);
+        double scaleFac = Math.min(originalTex.getWidth(), originalTex.getHeight())/(double)resolution;
+        for (int x = 0; x < resolution; x++)
+        {
+            for (int y = 0; y < resolution; y++)
+            {
+                newTexture.setColorAt(x, y, originalTex.getColorAt((int)(x*scaleFac), (int)(y*scaleFac))); 
+            }
+        }
+        return newTexture;
+    }
+    public Color[] sampleTexture(GreenfootImage texture, double percent)
+    {
+        Color[] colors = new Color[texture.getHeight()];
+        for (int y = 0; y < texture.getWidth(); y++)
+        {
+            colors[y] = texture.getColorAt((int)(percent*texture.getWidth())%(texture.getWidth()), y);
+        }
+        return colors;
     }
     
     public void setGraphics(Renderer r)
