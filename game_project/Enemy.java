@@ -1,4 +1,5 @@
 import greenfoot.*;  // (World, Actor, GreenfootImage, Greenfoot and MouseInfo)
+import java.util.ArrayList;
 
 public class Enemy extends Actor
 {
@@ -8,6 +9,7 @@ public class Enemy extends Actor
     private double startSize;
     private double size;
     private double range = 2;
+    private double speed = 0.2;
     
     private double[] hitAnimation;
     private static GreenfootImage hitTexture = null;
@@ -15,9 +17,16 @@ public class Enemy extends Actor
     
     private int health;
     
+    private Game gameWorld;
+    private Renderer render;
+    private Player player;
+    
+    private ArrayList<Wall> walls;
+    
     public Enemy(double x, double y, int h)
     {
         super();
+        
         pos = new Vector(x, y);
         health = h;
         startSize = h;
@@ -43,6 +52,37 @@ public class Enemy extends Actor
     {
         updateAnimation();
         checkDeath();
+        if (seesPlayer()) {
+            moveToPlayer();
+        }
+    }
+    
+    public void moveToPlayer() {
+        if (getWorld() == null) {
+            return;
+        }
+        Player player = getWorld().getObjects(Player.class).get(0);
+        Vector playerDirectionVector = player.getPos().minus(getPos());
+        Vector angleUnitVector = new Vector(playerDirectionVector.getAngle());
+        pos.add(angleUnitVector.times(speed));
+    }
+    
+    public boolean seesPlayer() {
+        if (getWorld() == null) {
+            return false;
+        }
+        
+        gameWorld = (Game)(getWorld());
+        render = gameWorld.getGraphics();
+        player = getWorld().getObjects(Player.class).get(0);
+        walls = gameWorld.getWalls();
+        
+        Vector playerDirectionVector = player.getPos().minus(getPos());
+        for (Wall wall: walls) {
+            Vector wallClosestPoint = render.castRay(getPos(), wall, playerDirectionVector.getAngle());
+            if (wallClosestPoint != null && getPos().getDist(wallClosestPoint) < getPos().getDist(player.getPos())) return false;
+        }
+        return true;
     }
     
     public void checkDeath()
@@ -84,5 +124,7 @@ public class Enemy extends Actor
     {
         return size;
     }
+    
+    
     
 }
