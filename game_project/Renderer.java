@@ -25,7 +25,7 @@ public class Renderer extends Actor
         // Render Constants
         WIDTH = world.getWidth();
         HEIGHT = world.getHeight();
-        FOV = 50 * Math.PI / 180;
+        FOV = 60 * Math.PI / 180;
         PIX_WIDTH = 3;
         // initialize references
         ((Game)getWorld()).setGraphics(this);
@@ -79,8 +79,8 @@ public class Renderer extends Actor
                     continue;
 
                 double actualDist = player.getPos().getDist(hitPt);
-                //double dist = Math.cos((double)x / WIDTH * FOV) * actualDist;
-                double dist = actualDist;
+                double dist = Math.cos(((double)x / WIDTH - 0.5) * FOV) * actualDist;
+                //double dist = actualDist;
                 if (dist < closestWallDist){
                     closestHitPt = hitPt;
                     closestWallDist = dist;

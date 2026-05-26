@@ -24,6 +24,7 @@ public class Player extends Actor
     
     private Animation armAnim;
     private boolean isAttacking = false;
+    private double attackRange = 10;
     
     public Player()
     {
@@ -62,8 +63,8 @@ public class Player extends Actor
                 armAnim.play();
                 isAttacking = true;
                 Object lookedAt = ((Game)getWorld()).getGraphics().getLookedAt();
-                if (lookedAt != null && lookedAt.getClass() == Enemy.class)
-                    ((Enemy)lookedAt).playHitAnimation();
+                if (lookedAt != null && lookedAt.getClass() == Enemy.class && ((Enemy)lookedAt).getPos().getDist(pos) < attackRange)
+                    ((Enemy)lookedAt).hit();
             }
         }
         if (Greenfoot.mouseClicked(null))

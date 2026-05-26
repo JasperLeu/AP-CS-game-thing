@@ -13,11 +13,14 @@ public class Enemy extends Actor
     private static GreenfootImage hitTexture = null;
     private Timer hitAnimTimer;
     
-    public Enemy(double x, double y)
+    private int health;
+    
+    public Enemy(double x, double y, int h)
     {
         super();
         pos = new Vector(x, y);
-        startSize = 2;
+        health = h;
+        startSize = h;
         size = startSize;
         
         hitAnimation = new double[]{1, .9, .7, .75, 1};
@@ -39,20 +42,32 @@ public class Enemy extends Actor
     public void act()
     {
         updateAnimation();
+        checkDeath();
+    }
+    
+    public void checkDeath()
+    {
+        if (health <= 0)
+        {
+            getWorld().removeObject(hitAnimTimer);
+            getWorld().removeObject(this);
+        }
     }
     
     public void updateAnimation()
     {
         size = startSize * hitAnimation[(int)(hitAnimTimer.getTime())%hitAnimation.length];
-        if (size != startSize)
+        if (size != startSize){
             texture = hitTexture;
+        }
         else
             texture = defaultTexture;
     }
     
-    public void playHitAnimation()
+    public void hit()
     {
         hitAnimTimer.reset();
+        health--;
     }
     
     public GreenfootImage getTexture()

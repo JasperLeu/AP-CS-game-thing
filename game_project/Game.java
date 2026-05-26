@@ -134,8 +134,8 @@ public class Game extends World
     {
         addObject(new Player(),550,50);
         addObject(new Map(),580,380);
-        addObject(new Enemy(-5, -5), 550, 200);
-        addObject(new Enemy(2, 2), 550, 200);
+        addObject(new Enemy(-5, -5, 3), 550, 200);
+        addObject(new Enemy(2, 2, 4), 550, 200);
         Renderer renderer = new Renderer();
         addObject(renderer,getWidth()/2,getHeight()/2);
     }
