@@ -87,10 +87,13 @@ public class Renderer extends Actor
                     closestWall = walls.get(i);
                 }
             }
+            int maxHeight = 0;
             // Loop through enemies and find all at this pixel
-            double closestEnemyDist = Double.MAX_VALUE;
-            Enemy closestEnemy = null;
-            double enemyTexturePos = 0; // percent (0->1) of where on the enemy sprite was hit;
+            ArrayList<Enemy> enemies = new ArrayList();
+            ArrayList<Double> enemyPts = new ArrayList();
+            ArrayList<Double> enemyDists = new ArrayList();
+            ArrayList<Integer> enemyHeights = new ArrayList();
+            
             for (Enemy enemy : allEnemies)
             {
                 Vector toEnemy = enemy.getPos().minus(player.getPos());
@@ -101,77 +104,63 @@ public class Renderer extends Actor
                 double ptOnEnemy = distToEnemy * Math.sin(angleToEnemy);
                 if (Math.abs(ptOnEnemy) > enemy.getSize()/2)
                     continue;
-                if (distToEnemy < closestEnemyDist)
-                {
-                    closestEnemyDist = distToEnemy;
-                    closestEnemy = enemy;
-                    enemyTexturePos = (ptOnEnemy + enemy.getSize()/2) / enemy.getSize();
-                }
+                enemies.add(enemy);
+                enemyPts.add((ptOnEnemy + enemy.getSize()/2) / enemy.getSize());
+                enemyDists.add(distToEnemy);
+                int enemyH = (int)(WIDTH / Math.tan(FOV/2)/2 * enemy.getSize() / distToEnemy);
+                enemyHeights.add(enemyH);
+                if (enemyH > maxHeight)
+                    maxHeight = enemyH;
             }
-            int maxHeight = 0;
             Color[] wallColors = new Color[0];
             int wallH = 0;
             if (closestWall != null){
                 wallH = (int)(WIDTH / Math.tan(FOV/2)/2 * closestWall.getHeight() / closestWallDist);
                 double percent = closestWall.getPt1().getDist(closestHitPt) / (closestWall.getHeight());
                 wallColors = ((Game)getWorld()).sampleTexture(closestWall.getTexture(), percent);
-                maxHeight = wallH;
+                if (wallH > maxHeight)
+                    maxHeight = wallH;
             }
-            int enemyH = 0;
-            Color[] enemyColors = new Color[0];
-            if (closestEnemy != null){
-                enemyH = (int)(WIDTH / Math.tan(FOV/2)/2 * closestEnemy.getSize() / closestEnemyDist);
-                enemyColors = ((Game)getWorld()).sampleTexture(closestEnemy.getTexture(), enemyTexturePos);
-                if (enemyH > maxHeight)
-                    maxHeight = enemyH;
+            Color[][] enemyColors = new Color[enemies.size()][];
+            for (int i = 0; i < enemyColors.length; i++){
+                enemyColors[i] = ((Game)getWorld()).sampleTexture(enemies.get(i).getTexture(), enemyPts.get(i));
             }
             // Draw the closest point from the raycast
             for (int y = -maxHeight/2; y < maxHeight/2; y+=PIX_WIDTH)
             {
                 // Sooo, all this was supposed to check for transparent pixels but it doesnt work when enemies overlap :(
                 Color currColor = null;
-                int tint = 0;
-                if (closestWall != null && Math.abs(y) < wallH / 2)
-                {
-                    tint = (int)(closestWallDist);
+                double closestDist = Double.MAX_VALUE;
+                
+                if (closestWall != null && Math.abs(y) < wallH/2){
+                    Color c = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
+                    if (c.getAlpha() == 0)
+                        continue;
+                    closestDist = closestWallDist;
+                    currColor = c;
                     if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
                         thingLookedAt = closestWall;
-                    if (closestEnemy != null && Math.abs(y) < enemyH/2)
-                    {
-                        if (closestEnemyDist > closestWallDist)
-                            currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
-                        if (closestEnemyDist <= closestWallDist || currColor!=null && currColor.getAlpha() == 0){
-                            currColor = enemyColors[(int)((y+enemyH/2)/(double)enemyH*enemyColors.length)];
-                            tint = (int)(closestEnemyDist);
-                            if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
-                                thingLookedAt = closestEnemy;
-                            if (currColor.getAlpha() == 0)
-                            {
-                                currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];
-                                if (currColor.getAlpha() == 0)
-                                    currColor = null;
-                            }
-                        }
-                    }
-                    else
-                        currColor = wallColors[(int)((y+wallH/2)/(double)wallH*wallColors.length)];         
                 }
-                else if (closestEnemy != null && Math.abs(y) < enemyH/2)
+                for (int i = 0; i < enemies.size(); i++)
                 {
-                    tint = (int)(closestEnemyDist);
-                    if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
-                        thingLookedAt = closestEnemy;
-                    currColor = enemyColors[(int)((y+enemyH/2)/(double)enemyH*enemyColors.length)];
-                    if (currColor.getAlpha() == 0)
-                        currColor = null;
+                    if (Math.abs(y) < enemyHeights.get(i)/2 && enemyDists.get(i) < closestDist)
+                    {
+                        Color c = enemyColors[i][(int)((y+enemyHeights.get(i)/2)/(double)enemyHeights.get(i)*enemyColors[i].length)];
+                        if (c.getAlpha() == 0)
+                            continue;
+                        closestDist = enemyDists.get(i);
+                        currColor = c;
+                        if (x == (WIDTH/PIX_WIDTH)/2*PIX_WIDTH && Math.abs(y) < PIX_WIDTH)
+                            thingLookedAt = enemies.get(i);
+                    }
                 }
                 
                 if (currColor != null)
                 {
-                    tint *= -2;
-                    int r = (int)clamp(currColor.getRed()+tint, 0, 255);
-                    int g = (int)clamp(currColor.getGreen()+tint, 0, 255);
-                    int b = (int)clamp(currColor.getBlue()+tint, 0, 255);
+                    closestDist *= -2;
+                    int r = (int)clamp(currColor.getRed()+closestDist, 0, 255);
+                    int g = (int)clamp(currColor.getGreen()+closestDist, 0, 255);
+                    int b = (int)clamp(currColor.getBlue()+closestDist, 0, 255);
                     screen.setColor(new Color(r, g, b));
                     screen.fillRect(WIDTH-x-PIX_WIDTH, HEIGHT/2+y, PIX_WIDTH, PIX_WIDTH);
                 }

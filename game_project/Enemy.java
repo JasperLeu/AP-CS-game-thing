@@ -41,7 +41,7 @@ public class Enemy extends Actor
         world.addObject(hitAnimTimer, 0, 0);
         
         if (texture == null)
-            defaultTexture = ((Game)world).setupTexture("guy.jpg", 256);
+            defaultTexture = ((Game)world).setupTexture("enemy.png", 256);
         if (hitTexture == null)
             hitTexture = ((Game)world).tintImage(defaultTexture, new Color(100, 0, 0));
             

@@ -89,7 +89,7 @@ public class Game extends World
                 int b = c.getBlue() + tint.getBlue();
                 if (b > 255)
                     b = 255;
-                newImage.setColorAt(x, y, new Color(r,g,b));
+                newImage.setColorAt(x, y, new Color(r,g,b, c.getAlpha()));
             }
         }
         return newImage;
