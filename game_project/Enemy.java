@@ -8,8 +8,8 @@ public class Enemy extends Actor
     private static GreenfootImage defaultTexture = null;
     private double startSize;
     private double size;
-    private double range = 2;
-    private double speed = 0.2;
+    private double attackRange = 5;
+    private double speed = 3;
     
     private double[] hitAnimation;
     private static GreenfootImage hitTexture = null;
@@ -52,19 +52,17 @@ public class Enemy extends Actor
     {
         updateAnimation();
         checkDeath();
-        if (seesPlayer()) {
+        if (seesPlayer())
             moveToPlayer();
-        }
     }
     
     public void moveToPlayer() {
-        if (getWorld() == null) {
-            return;
-        }
         Player player = getWorld().getObjects(Player.class).get(0);
-        Vector playerDirectionVector = player.getPos().minus(getPos());
-        Vector angleUnitVector = new Vector(playerDirectionVector.getAngle());
-        pos.add(angleUnitVector.times(speed));
+        Vector toPlayer = player.getPos().minus(getPos());
+        if (toPlayer.magnitude() < attackRange)
+            return;
+        Vector angleUnitVector = toPlayer.normalized();
+        pos.add(angleUnitVector.times((speed+(double)health/2)*((Game)getWorld()).getDeltaTime()));
     }
     
     public boolean seesPlayer() {

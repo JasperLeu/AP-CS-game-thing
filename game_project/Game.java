@@ -21,7 +21,7 @@ public class Game extends World
         lastTime = System.currentTimeMillis();
         Greenfoot.setSpeed(100);
         prepare();
-        setPaintOrder(Animation.class, Renderer.class);
+        setPaintOrder(Counter.class, Animation.class, Renderer.class);
     }
     
     public void act()

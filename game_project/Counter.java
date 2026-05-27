@@ -18,6 +18,10 @@ public class Counter extends Actor
         value = startValue;
         textColor = color;
         counterLabel = label;
+    }
+    
+    protected void addedToWorld(World world)
+    {
         updateText();
     }
     
@@ -43,6 +47,6 @@ public class Counter extends Actor
         String val = ""+value;
         if (value == (int)value)
             val = ""+(int)value;
-        setImage(new GreenfootImage(counterLabel + ": " + value, getWorld().getHeight()/8, textColor, new Color(0, 0, 0, 0)));
+        setImage(new GreenfootImage(counterLabel + ": " + value, getWorld().getHeight()/15, textColor, new Color(0, 0, 0, 0)));
     }
 }
