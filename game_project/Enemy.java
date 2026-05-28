@@ -21,7 +21,7 @@ public class Enemy extends Actor
     private Timer attackTimer;
     
     private Game gameWorld;
-    
+    private Player player;
     private ArrayList<Wall> walls;
     
     public Enemy(double x, double y, int h)
@@ -66,11 +66,10 @@ public class Enemy extends Actor
     }
     
     public void moveToPlayer() {
-        Player player = ((Game)getWorld()).getPlayer();
         Vector toPlayer = player.getPos().minus(getPos());
         if (toPlayer.magnitude() < attackRange){
             if (attackTimer.getTimer() >= attackDelay)
-                attackPlayer();
+                attackPlayer(damage);
             return;
         }
         Vector angleUnitVector = toPlayer.normalized();
@@ -78,19 +77,19 @@ public class Enemy extends Actor
     }
     
     public boolean seesPlayer() {
-        if (getWorld() == null) {
-            return false;
+        if (gameWorld == null)
+        {
+            gameWorld = (Game)(getWorld());
+            player = gameWorld.getPlayer();
+            walls = gameWorld.getWalls();
         }
+        Renderer render = gameWorld.getGraphics();
         
-        gameWorld = (Game)(getWorld());
-        render = gameWorld.getGraphics();
-        player = gameWorld.getPlayer();
-        walls = gameWorld.getWalls();
-        
-        Vector playerDirectionVector = player.getPos().minus(getPos());
+        double angleToPlayer = player.getPos().minus(getPos()).getAngle();
         for (Wall wall: walls) {
-            Vector wallClosestPoint = render.castRay(getPos(), wall, playerDirectionVector.getAngle());
-            if (wallClosestPoint != null && getPos().getDist(wallClosestPoint) < getPos().getDist(player.getPos())) return false;
+            Vector wallClosestPoint = render.castRay(getPos(), wall, angleToPlayer);
+            if (wallClosestPoint != null && getPos().getDist(wallClosestPoint) < getPos().getDist(player.getPos())) 
+                return false;
         }
         return true;
     }
