@@ -8,10 +8,6 @@ public class Enemy extends Actor
     private static GreenfootImage defaultTexture = null;
     private double startSize;
     private double size;
-    
-    // Enemy stats
-    private int health;
-    private double attackRange = 2;
     private double speed = 3;
     private int damageAmount = 10;
     
@@ -22,11 +18,14 @@ public class Enemy extends Actor
     private static GreenfootImage hitTexture = null;
     private Timer hitAnimTimer;
     
-    private Game gameWorld;
-    private Renderer render;
-    private Player player;
-    private Timer cooldownTimer;
+    private int health;
+    private int damage = 10;
+    private double attackRange = 5;
+    private double attackDelay = 2;
+    private Timer attackTimer;
     
+    private Game gameWorld;
+    private Player player;
     private ArrayList<Wall> walls;
     
     public Enemy(double x, double y, int h)
@@ -40,13 +39,13 @@ public class Enemy extends Actor
         
         hitAnimation = new double[]{1, .9, .7, .75, 1};
         hitAnimTimer = new Timer(15, hitAnimation.length);
-        cooldownTimer = new Timer(cooldownDuration);
+        attackTimer = new Timer(1, attackDelay);
     }
     
     protected void addedToWorld(World world)
     {
         world.addObject(hitAnimTimer, 0, 0);
-        world.addObject(cooldownTimer, 0, 0);
+        world.addObject(attackTimer, 0, 0);
         
         if (texture == null)
             defaultTexture = ((Game)world).setupTexture("enemy.png", 256);
@@ -59,9 +58,15 @@ public class Enemy extends Actor
     public void act()
     {
         updateAnimation();
-        checkDeath();
         if (seesPlayer())
             moveToPlayer();
+        checkDeath();
+    }
+
+    public void attackPlayer()
+    {
+        ((Game)getWorld()).getPlayer().damage(damage);
+        attackTimer.reset();
     }
     
     public void attackPlayer() {
@@ -70,13 +75,10 @@ public class Enemy extends Actor
     }
     
     public void moveToPlayer() {
-        Player player = getWorld().getObjects(Player.class).get(0);
         Vector toPlayer = player.getPos().minus(getPos());
-        if (toPlayer.magnitude() <= attackRange) {
-            if (cooldownTimer.getTime() >= cooldownDuration) {
-                attackPlayer();
-                cooldownTimer.reset();
-            }
+        if (toPlayer.magnitude() < attackRange){
+            if (attackTimer.getTimer() >= attackDelay)
+                attackPlayer(damage);
             return;
         }
         Vector angleUnitVector = toPlayer.normalized();
@@ -84,19 +86,19 @@ public class Enemy extends Actor
     }
     
     public boolean seesPlayer() {
-        if (getWorld() == null) {
-            return false;
+        if (gameWorld == null)
+        {
+            gameWorld = (Game)(getWorld());
+            player = gameWorld.getPlayer();
+            walls = gameWorld.getWalls();
         }
+        Renderer render = gameWorld.getGraphics();
         
-        gameWorld = (Game)(getWorld());
-        render = gameWorld.getGraphics();
-        player = getWorld().getObjects(Player.class).get(0);
-        walls = gameWorld.getWalls();
-        
-        Vector playerDirectionVector = player.getPos().minus(getPos());
+        double angleToPlayer = player.getPos().minus(getPos()).getAngle();
         for (Wall wall: walls) {
-            Vector wallClosestPoint = render.castRay(getPos(), wall, playerDirectionVector.getAngle());
-            if (wallClosestPoint != null && getPos().getDist(wallClosestPoint) < getPos().getDist(player.getPos())) return false;
+            Vector wallClosestPoint = render.castRay(getPos(), wall, angleToPlayer);
+            if (wallClosestPoint != null && getPos().getDist(wallClosestPoint) < getPos().getDist(player.getPos())) 
+                return false;
         }
         return true;
     }
@@ -120,10 +122,13 @@ public class Enemy extends Actor
             texture = defaultTexture;
     }
     
-    public void hit()
+    public boolean hit()
     {
         hitAnimTimer.reset();
         health--;
+        if (health <= 0)
+            return true;
+        return false;
     }
     
     public GreenfootImage getTexture()
