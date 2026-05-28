@@ -8,7 +8,6 @@ public class Enemy extends Actor
     private static GreenfootImage defaultTexture = null;
     private double startSize;
     private double size;
-    private double attackRange = 5;
     private double speed = 3;
     
     private double[] hitAnimation;
@@ -16,10 +15,12 @@ public class Enemy extends Actor
     private Timer hitAnimTimer;
     
     private int health;
+    private int damage = 10;
+    private double attackRange = 5;
+    private double attackDelay = 2;
+    private Timer attackTimer;
     
     private Game gameWorld;
-    private Renderer render;
-    private Player player;
     
     private ArrayList<Wall> walls;
     
@@ -34,11 +35,13 @@ public class Enemy extends Actor
         
         hitAnimation = new double[]{1, .9, .7, .75, 1};
         hitAnimTimer = new Timer(15, hitAnimation.length);
+        attackTimer = new Timer(1, attackDelay);
     }
     
     protected void addedToWorld(World world)
     {
         world.addObject(hitAnimTimer, 0, 0);
+        world.addObject(attackTimer, 0, 0);
         
         if (texture == null)
             defaultTexture = ((Game)world).setupTexture("enemy.png", 256);
@@ -55,12 +58,21 @@ public class Enemy extends Actor
         if (seesPlayer())
             moveToPlayer();
     }
+
+    public void attackPlayer()
+    {
+        ((Game)getWorld()).getPlayer().damage(damage);
+        attackTimer.reset();
+    }
     
     public void moveToPlayer() {
-        Player player = getWorld().getObjects(Player.class).get(0);
+        Player player = ((Game)getWorld()).getPlayer();
         Vector toPlayer = player.getPos().minus(getPos());
-        if (toPlayer.magnitude() < attackRange)
+        if (toPlayer.magnitude() < attackRange){
+            if (attackTimer.getTimer() >= attackDelay)
+                attackPlayer();
             return;
+        }
         Vector angleUnitVector = toPlayer.normalized();
         pos.add(angleUnitVector.times((speed+(double)health/2)*((Game)getWorld()).getDeltaTime()));
     }
@@ -72,7 +84,7 @@ public class Enemy extends Actor
         
         gameWorld = (Game)(getWorld());
         render = gameWorld.getGraphics();
-        player = getWorld().getObjects(Player.class).get(0);
+        player = gameWorld.getPlayer();
         walls = gameWorld.getWalls();
         
         Vector playerDirectionVector = player.getPos().minus(getPos());
