@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=EndScreen
+comment0.text=\n\ Write\ a\ description\ of\ class\ EndScreen\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=score\ waves
+comment1.target=EndScreen(double,\ double)
+comment2.params=world
+comment2.target=void\ addedToWorld(greenfoot.World)
+numComments=3
