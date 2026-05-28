@@ -25,6 +25,10 @@ public class Player extends Actor
     private Animation armAnim;
     private boolean isAttacking = false;
     private double attackRange = 10;
+
+    private Counter healthCounter;
+    private Counter scoreCounter;
+    private boolean alive = true;
     
     public Player()
     {
@@ -32,6 +36,8 @@ public class Player extends Actor
         moveSpeed = 15;
         turnSpeed = 2;
         pos = new Vector(0, 0);
+        healthCounter = new Counter("HEALTH", 100, Color.RED);
+        scoreCounter = new Counter("SCORE", 0, Color.RED);
     }
     protected void addedToWorld(World world)
     {
@@ -42,14 +48,37 @@ public class Player extends Actor
             "frame3.png", 
             "frame4.png"}, 15);
         world.addObject(armAnim, world.getWidth()/2, world.getHeight()*4/7);
+        world.addObject(healthCounter, world.getWidth()/2, world.getHeight()-30);
+        world.addObject(scoreCounter, world.getWidth()/2, 40);
     }
     
     public void act()
     {
-        move();
-        turn();
-        checkAttack();
+        if (alive)
+        {
+            move();
+            turn();
+            checkAttack();
+        }
+            
         // Add your action code here.
+    }
+
+    public void damage(double amount)
+    {
+        if (!alive)
+            return;
+        healthCounter.add(-amount);
+        checkDeath();
+    }
+
+    public void checkDeath()
+    {
+        if (healthCounter.getValue() <= 0)
+        {
+            healthCounter.setValue(0);
+            alive = false;
+        }
     }
     
     public void checkAttack()
@@ -64,7 +93,10 @@ public class Player extends Actor
                 isAttacking = true;
                 Object lookedAt = ((Game)getWorld()).getGraphics().getLookedAt();
                 if (lookedAt != null && lookedAt.getClass() == Enemy.class && ((Enemy)lookedAt).getPos().getDist(pos) < attackRange)
-                    ((Enemy)lookedAt).hit();
+                {
+                    if (((Enemy)lookedAt).hit());
+                        scoreCounter.add(1);
+                }
             }
         }
         if (Greenfoot.mouseClicked(null))
