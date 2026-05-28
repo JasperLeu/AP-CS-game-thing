@@ -54,9 +54,9 @@ public class Enemy extends Actor
     public void act()
     {
         updateAnimation();
-        checkDeath();
         if (seesPlayer())
             moveToPlayer();
+        checkDeath();
     }
 
     public void attackPlayer()
@@ -114,10 +114,13 @@ public class Enemy extends Actor
             texture = defaultTexture;
     }
     
-    public void hit()
+    public boolean hit()
     {
         hitAnimTimer.reset();
         health--;
+        if (health <= 0)
+            return true;
+        return false;
     }
     
     public GreenfootImage getTexture()
