@@ -25,6 +25,7 @@ public class Player extends Actor
     private Animation armAnim;
     private boolean isAttacking = false;
     private double attackRange = 10;
+    private Counter healthCounter;
     
     public Player()
     {
@@ -42,6 +43,9 @@ public class Player extends Actor
             "frame3.png", 
             "frame4.png"}, 15);
         world.addObject(armAnim, world.getWidth()/2, world.getHeight()*4/7);
+        
+        healthCounter = new Counter("Health", 100, Color.RED);
+        world.addObject(healthCounter, getWorld().getWidth()/2, getWorld().getHeight()-30);
     }
     
     public void act()
@@ -50,6 +54,12 @@ public class Player extends Actor
         turn();
         checkAttack();
         // Add your action code here.
+    }
+    
+    public void takeDamage(double amount) {
+        if (healthCounter == null) return;
+        
+        healthCounter.add(-amount);
     }
     
     public void checkAttack()
@@ -75,6 +85,7 @@ public class Player extends Actor
     {
         return pos;
     }
+    
     public double getRot()
     {
         return rot;
