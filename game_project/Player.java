@@ -81,6 +81,12 @@ public class Player extends Actor
         }
     }
     
+    public void takeDamage(double amount) {
+        if (healthCounter == null) return;
+        
+        healthCounter.add(-amount);
+    }
+    
     public void checkAttack()
     {
         MouseInfo input = Greenfoot.getMouseInfo();
@@ -107,6 +113,7 @@ public class Player extends Actor
     {
         return pos;
     }
+    
     public double getRot()
     {
         return rot;

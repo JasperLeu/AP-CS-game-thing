@@ -17,12 +17,19 @@ public class Timer extends Actor
         FPS = fps;
         timer = 0;
     }
+    public Timer(double max)
+    {
+        maxTime = max;
+        FPS = 1;
+        timer = 0;
+    }
     public void act()
     {
         if (timer < maxTime)
             timer += ((Game)getWorld()).getDeltaTime()*FPS;
-        else
+        else {
             timer = maxTime;
+        }
     }
     public double getTime()
     {

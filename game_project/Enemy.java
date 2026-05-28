@@ -9,6 +9,10 @@ public class Enemy extends Actor
     private double startSize;
     private double size;
     private double speed = 3;
+    private int damageAmount = 10;
+    
+    private boolean cooldownActive = false;
+    private double cooldownDuration = 1.0;
     
     private double[] hitAnimation;
     private static GreenfootImage hitTexture = null;
@@ -63,6 +67,11 @@ public class Enemy extends Actor
     {
         ((Game)getWorld()).getPlayer().damage(damage);
         attackTimer.reset();
+    }
+    
+    public void attackPlayer() {
+        Player player = gameWorld.getPlayer();
+        player.takeDamage(damageAmount);
     }
     
     public void moveToPlayer() {
