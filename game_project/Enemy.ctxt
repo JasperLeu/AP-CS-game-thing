@@ -23,5 +23,5 @@ comment7.target=void\ checkDeath()
 comment8.params=
 comment8.target=void\ updateAnimation()
 comment9.params=
-comment9.target=void\ hit()
+comment9.target=boolean\ hit()
 numComments=13

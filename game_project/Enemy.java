@@ -69,16 +69,11 @@ public class Enemy extends Actor
         attackTimer.reset();
     }
     
-    public void attackPlayer() {
-        Player player = gameWorld.getPlayer();
-        player.takeDamage(damageAmount);
-    }
-    
     public void moveToPlayer() {
         Vector toPlayer = player.getPos().minus(getPos());
         if (toPlayer.magnitude() < attackRange){
-            if (attackTimer.getTimer() >= attackDelay)
-                attackPlayer(damage);
+            if (attackTimer.getTime() >= attackDelay)
+                attackPlayer();
             return;
         }
         Vector angleUnitVector = toPlayer.normalized();

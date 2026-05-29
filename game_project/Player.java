@@ -78,6 +78,7 @@ public class Player extends Actor
         {
             healthCounter.setValue(0);
             alive = false;
+            die();
         }
     }
     
@@ -85,6 +86,11 @@ public class Player extends Actor
         if (healthCounter == null) return;
         
         healthCounter.add(-amount);
+    }
+    
+    public void die() {
+        EndScreen deathScreen = new EndScreen(scoreCounter.getValue(), 69);
+        getWorld().addObject(deathScreen, 500, 300);
     }
     
     public void checkAttack()
@@ -100,7 +106,7 @@ public class Player extends Actor
                 Object lookedAt = ((Game)getWorld()).getGraphics().getLookedAt();
                 if (lookedAt != null && lookedAt.getClass() == Enemy.class && ((Enemy)lookedAt).getPos().getDist(pos) < attackRange)
                 {
-                    if (((Enemy)lookedAt).hit());
+                    if (((Enemy)lookedAt).hit())
                         scoreCounter.add(1);
                 }
             }
