@@ -20,14 +20,51 @@ public class Map extends Actor
         walls = new ArrayList<Wall>();
         
         FLOOR_COLOR = new Color(140, 140, 140, 255);
-        CEILING_COLOR = new Color(90, 90, 90);
+        CEILING_COLOR = new Color(90, 90, 90);		
         
-        double[] pts = {-10, -10, -10, 7, 5, 7, 5, 0, 8, 0, 8, 20, 15, 20, 15, -10, -10, -10};
-        // add all of the walls
-        for (int i = 0; i < pts.length-3; i+=2)
-        {
-            walls.add(new Wall(world, pts[i], pts[i+1], pts[i+2], pts[i+3]));
-        }
+	walls.add(new Wall(world, -11.25, -6.25, -11.25, -11.25));
+	walls.add(new Wall(world, -11.25, -11.25, 8.75, -11.25));
+	walls.add(new Wall(world, 8.75, -11.25, 8.75, 8.75));
+	walls.add(new Wall(world, 8.75, 8.75, -11.25, 8.75));
+	walls.add(new Wall(world, -11.25, 8.75, -11.25, -1.25));
+	walls.add(new Wall(world, -11.25, -1.25, -16.25, -1.25));
+	walls.add(new Wall(world, -16.25, -1.25, -16.25, 28.75));
+	walls.add(new Wall(world, -16.25, 28.75, -11.25, 28.75));
+	walls.add(new Wall(world, -11.25, 28.75, -11.25, 8.75));
+	walls.add(new Wall(world, -11.25, -6.25, -36.25, -6.25));
+	walls.add(new Wall(world, -36.25, -6.25, -36.25, -11.25));
+	walls.add(new Wall(world, -36.25, -11.25, -11.25, -11.25));
+	walls.add(new Wall(world, -46.25, -6.25, -41.25, -6.25));
+	walls.add(new Wall(world, -41.25, -6.25, -41.25, -11.25));
+	walls.add(new Wall(world, -41.25, -11.25, -46.25, -11.25));
+	walls.add(new Wall(world, -46.25, -41.25, -46.25, 33.75));
+	walls.add(new Wall(world, -46.25, 33.75, 28.75, 33.75));
+	walls.add(new Wall(world, 28.75, 33.75, 28.75, -76.25));
+	walls.add(new Wall(world, 28.75, -76.25, -16.25, -76.25));
+	walls.add(new Wall(world, -16.25, -76.25, -16.25, -46.25));
+	walls.add(new Wall(world, -16.25, -46.25, 18.75, -46.25));
+	walls.add(new Wall(world, 18.75, -46.25, 18.75, -41.25));
+	walls.add(new Wall(world, 18.75, -41.25, -46.25, -41.25));
+	walls.add(new Wall(world, 28.75, -41.25, 23.75, -41.25));
+	walls.add(new Wall(world, 23.75, -41.25, 23.75, -46.25));
+	walls.add(new Wall(world, 23.75, -46.25, 28.75, -46.25));
+	walls.add(new Wall(world, 8.75, -11.25, 8.75, -36.25));
+	walls.add(new Wall(world, 8.75, -36.25, 13.75, -36.25));
+	walls.add(new Wall(world, 13.75, -36.25, 13.75, 8.75));
+	walls.add(new Wall(world, 13.75, 8.75, 8.75, 8.75));
+	walls.add(new Wall(world, -21.25, -41.25, -21.25, -16.25));
+	walls.add(new Wall(world, -21.25, -16.25, -16.25, -16.25));
+	walls.add(new Wall(world, -16.25, -16.25, -16.25, -41.25));
+	world.addObject(new Enemy(-30.9375, -35.625, 4), 0, 0);
+	world.addObject(new Enemy(-9.6875, -30.9375, 4), 0, 0);
+	world.addObject(new Enemy(-8.75, -54.0625, 4), 0, 0);
+	world.addObject(new Enemy(-3.125, -68.75, 4), 0, 0);
+	world.addObject(new Enemy(21.25, -19.6875, 4), 0, 0);
+	world.addObject(new Enemy(-1.875, 14.6875, 4), 0, 0);
+	world.addObject(new Enemy(-23.125, 14.6875, 4), 0, 0);
+	world.addObject(new Enemy(-42.1875, 11.25, 4), 0, 0);
+	world.addObject(new Enemy(21.875, 25.9375, 4), 0, 0);
+	
     }
     
     public Color getFloorColor()

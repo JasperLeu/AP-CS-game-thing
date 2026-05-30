@@ -186,7 +186,7 @@ public class Renderer extends Actor
         // for when angle is vertical
         else if (angleIsVertical)
         {
-            double m = ((double)wall.getY2()-wall.getY1())/(wall.getX2()-wall.getX1());
+            double m = (wall.getY2()-wall.getY1())/(wall.getX2()-wall.getX1());
             if ((m * pos.getX() + wall.getY1() - wall.getX1() * m < pos.getY()) == (Math.sin(angle) > m*Math.cos(angle)))
                 return null;
             // check if angle points awaay from wall
@@ -194,7 +194,7 @@ public class Renderer extends Actor
         }
         else // normal case (no infinite slope or anything)
         {
-            double m = ((double)wall.getY2()-wall.getY1())/(wall.getX2()-wall.getX1());
+            double m = (wall.getY2()-wall.getY1())/(wall.getX2()-wall.getX1());
             if ((m * pos.getX() + wall.getY1() - wall.getX1() * m < pos.getY()) == (Math.sin(angle) > m*Math.cos(angle)))
                 return null;
             // return coord of intersect
@@ -203,12 +203,12 @@ public class Renderer extends Actor
             hitPt = new Vector(xIntersect, yIntersect);
         }
         // check if hit point is actually between the two specified points
-        int minX = (int)Math.min(wall.getX1(), wall.getX2());
-        int maxX = (int)Math.max(wall.getX1(), wall.getX2());
-        int minY = (int)Math.min(wall.getY1(), wall.getY2());
-        int maxY = (int)Math.max(wall.getY1(), wall.getY2());
-        double roundX = (double)Math.round(hitPt.getX()*10000)/10000;
-        double roundY = (double)Math.round(hitPt.getY()*10000)/10000;
+        double minX = Math.round(Math.min(wall.getX1(), wall.getX2())*10000)/10000.0;
+        double maxX = Math.round(Math.max(wall.getX1(), wall.getX2())*10000)/10000.0;
+        double minY = Math.round(Math.min(wall.getY1(), wall.getY2())*10000)/10000.0;
+        double maxY = Math.round(Math.max(wall.getY1(), wall.getY2())*10000)/10000.0;
+        double roundX = (double)Math.round(hitPt.getX()*10000)/10000.0;
+        double roundY = (double)Math.round(hitPt.getY()*10000)/10000.0;
         if (roundX <= maxX && roundX >= minX && roundY <= maxY && roundY >= minY)
             return hitPt;
         return null;
