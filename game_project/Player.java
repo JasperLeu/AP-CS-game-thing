@@ -29,6 +29,12 @@ public class Player extends Actor
     private Counter healthCounter;
     private Counter scoreCounter;
     private boolean alive = true;
+    private Overlay damageOverlay;
+    private String damageSoundFile;
+    
+    private GreenfootSound walkSound;
+    private String swingSoundFile;
+    private String hitSoundFile;
     
     public Player()
     {
@@ -38,6 +44,11 @@ public class Player extends Actor
         pos = new Vector(0, 0);
         healthCounter = new Counter("HEALTH", 100, Color.RED);
         scoreCounter = new Counter("SCORE", 0, Color.RED);
+        damageOverlay = new Overlay(new Color(255, 0, 0, 150), 1);
+        walkSound = new GreenfootSound("running.mp3");
+        damageSoundFile = "hurt.mp3";
+        swingSoundFile = "swing.mp3";
+        hitSoundFile = "hit.mp3";
     }
     protected void addedToWorld(World world)
     {
@@ -47,6 +58,7 @@ public class Player extends Actor
             "frame2.png", 
             "frame3.png", 
             "frame4.png"}, 15);
+        world.addObject(damageOverlay, world.getWidth()/2, world.getHeight()/2);
         world.addObject(armAnim, world.getWidth()/2, world.getHeight()*4/7);
         world.addObject(healthCounter, world.getWidth()/2, world.getHeight()-30);
         world.addObject(scoreCounter, world.getWidth()/2, 40);
@@ -68,6 +80,8 @@ public class Player extends Actor
     {
         if (!alive)
             return;
+        damageOverlay.activate();
+        new GreenfootSound(damageSoundFile).play();
         healthCounter.add(-amount);
         checkDeath();
     }
@@ -80,12 +94,6 @@ public class Player extends Actor
             alive = false;
             die();
         }
-    }
-    
-    public void takeDamage(double amount) {
-        if (healthCounter == null) return;
-        
-        healthCounter.add(-amount);
     }
     
     public void die() {
@@ -102,10 +110,12 @@ public class Player extends Actor
             {
                 // code for attacking
                 armAnim.play();
+                new GreenfootSound(swingSoundFile).play();
                 isAttacking = true;
                 Object lookedAt = ((Game)getWorld()).getGraphics().getLookedAt();
                 if (lookedAt != null && lookedAt.getClass() == Enemy.class && ((Enemy)lookedAt).getPos().getDist(pos) < attackRange)
                 {
+                    new GreenfootSound(hitSoundFile).play();
                     if (((Enemy)lookedAt).hit())
                         scoreCounter.add(1);
                 }
@@ -145,6 +155,10 @@ public class Player extends Actor
             movementVec.add(new Vector(-mSpd * Math.cos(rot+Math.PI/2), -mSpd * Math.sin(rot+Math.PI/2)));
         }
         applyMovement(movementVec);
+        if (movementVec.magnitude() > 0)
+            walkSound.playLoop();
+        else
+            walkSound.stop();
     }
     public void applyMovement(Vector moveVector)
     {

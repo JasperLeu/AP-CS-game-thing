@@ -27,14 +27,19 @@ public class Timer extends Actor
     {
         if (timer < maxTime)
             timer += ((Game)getWorld()).getDeltaTime()*FPS;
-        else {
+        if (timer > maxTime){
             timer = maxTime;
         }
+    }
+    public void finishTime()
+    {
+        timer = maxTime;
     }
     public double getTime()
     {
         return timer;
     }
+    
     public void reset()
     {
         timer = 0;
