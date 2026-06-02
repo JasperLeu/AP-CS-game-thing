@@ -33,7 +33,6 @@ public class Overlay extends Actor
     public void act()
     {
         double progress = activationTimer.getTime() / fadeDuration;
-        System.out.println(activationTimer.getTime());
         image.setTransparency((int)(startOpacity * (1-progress)));
     }
     public void activate()
