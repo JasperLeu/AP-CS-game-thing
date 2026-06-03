@@ -59,6 +59,13 @@ public class Game extends World
         return colors;
     }
     
+    public void waveComplete() {
+        player.incrementWave();
+        player.addScore(10000 + 100*player.getHealth());
+        map.updateWallsOnWave(this, player.getWave());
+        map.updateEnemiesOnWave(this, player.getWave());
+    }
+    
     public GreenfootImage rescaleImage(GreenfootImage img, int newWidth)
     {
         double factor = (double)newWidth / img.getWidth();

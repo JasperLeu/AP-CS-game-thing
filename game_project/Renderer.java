@@ -72,9 +72,9 @@ public class Renderer extends Actor
             double closestWallDist = Integer.MAX_VALUE;
             Vector closestHitPt = null;
             Wall closestWall = null;
-            for (int i = 0; i < walls.size(); i ++) // Loop through each wall and get a raycast to it.
+            for (Wall w : ((Game)getWorld()).getWalls()) // Loop through each wall and get a raycast to it.
             {
-                Vector hitPt = castRay(player.getPos(), walls.get(i), angle);
+                Vector hitPt = castRay(player.getPos(), w, angle);
                 if (hitPt == null)
                     continue;
 
@@ -84,7 +84,7 @@ public class Renderer extends Actor
                 if (dist < closestWallDist){
                     closestHitPt = hitPt;
                     closestWallDist = dist;
-                    closestWall = walls.get(i);
+                    closestWall = w;
                 }
             }
             int maxHeight = 0;
@@ -123,6 +123,7 @@ public class Renderer extends Actor
             }
             Color[][] enemyColors = new Color[enemies.size()][];
             for (int i = 0; i < enemyColors.length; i++){
+                if (enemies.get(i).getTexture()  == null) return;
                 enemyColors[i] = ((Game)getWorld()).sampleTexture(enemies.get(i).getTexture(), enemyPts.get(i));
             }
             // Draw the closest point from the raycast

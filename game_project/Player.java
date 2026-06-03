@@ -24,10 +24,14 @@ public class Player extends Actor
     
     private Animation armAnim;
     private boolean isAttacking = false;
-    private double attackRange = 10;
+    private double attackRange = 100;
 
     private Counter healthCounter;
     private Counter scoreCounter;
+    private Counter currWaveCounter;
+    private Counter maxWaveCounter;
+    private int score = 0;
+    
     private boolean alive = true;
     private Overlay damageOverlay;
     private String damageSoundFile;
@@ -42,8 +46,12 @@ public class Player extends Actor
         moveSpeed = 15;
         turnSpeed = 2;
         pos = new Vector(0, 0);
-        healthCounter = new Counter("HEALTH", 100, Color.RED);
-        scoreCounter = new Counter("SCORE", 0, Color.RED);
+        
+        healthCounter = new Counter("❤ ", 100, Color.RED);
+        scoreCounter = new Counter("", 0, Color.WHITE);
+        currWaveCounter = new Counter("wave ", 1, Color.WHITE);
+        maxWaveCounter = new Counter("/ ", 8, Color.WHITE);
+        
         damageOverlay = new Overlay(new Color(255, 0, 0, 150), 1);
         walkSound = new GreenfootSound("running.mp3");
         damageSoundFile = "hurt.mp3";
@@ -60,8 +68,11 @@ public class Player extends Actor
             "frame4.png"}, 15);
         world.addObject(damageOverlay, world.getWidth()/2, world.getHeight()/2);
         world.addObject(armAnim, world.getWidth()/2, world.getHeight()*4/7);
-        world.addObject(healthCounter, world.getWidth()/2, world.getHeight()-30);
-        world.addObject(scoreCounter, world.getWidth()/2, 40);
+        
+        world.addObject(healthCounter, 80, world.getHeight()-40);
+        world.addObject(scoreCounter, 80, world.getHeight()-80);
+        world.addObject(currWaveCounter, 200, world.getHeight()-40);
+        world.addObject(maxWaveCounter, 280, world.getHeight()-40);
     }
     
     public void act()
@@ -97,7 +108,7 @@ public class Player extends Actor
     }
     
     public void die() {
-        EndScreen deathScreen = new EndScreen(scoreCounter.getValue(), 69);
+        EndScreen deathScreen = new EndScreen(scoreCounter.getValue(), currWaveCounter.getValue());
         getWorld().addObject(deathScreen, 500, 300);
     }
     
@@ -116,8 +127,10 @@ public class Player extends Actor
                 if (lookedAt != null && lookedAt.getClass() == Enemy.class && ((Enemy)lookedAt).getPos().getDist(pos) < attackRange)
                 {
                     new GreenfootSound(hitSoundFile).play();
-                    if (((Enemy)lookedAt).hit())
-                        scoreCounter.add(1);
+                    scoreCounter.add(1000);
+                    if (((Enemy)lookedAt).hit()) {
+                        scoreCounter.add(5000);
+                    }
                 }
             }
         }
@@ -231,5 +244,21 @@ public class Player extends Actor
             return true;
         }
         return false;
+    }
+    
+    public void addScore(int amt) {
+        scoreCounter.add(amt);
+    }
+    
+    public void incrementWave() {
+        currWaveCounter.add(1);
+    }
+    
+    public int getWave() {
+        return (int)(currWaveCounter.getValue());
+    }
+    
+    public int getHealth() {
+        return (int)(healthCounter.getValue());
     }
 }

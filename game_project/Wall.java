@@ -26,6 +26,16 @@ public class Wall
             texture = ((Game)w).setupTexture("brick.jpg", 64);
     }
     
+    public Wall(World w, double x1, double y1, double x2, double y2, String t)
+    {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        height = 5;
+        texture = ((Game)w).setupTexture(t, 64);
+    }
+    
     public boolean isVertical()
     {
         return x1 == x2;

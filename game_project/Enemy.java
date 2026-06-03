@@ -5,11 +5,9 @@ public class Enemy extends Actor
 {
     private Vector pos;
     private GreenfootImage texture = null;
-    private static GreenfootImage defaultTexture = null;
-    private double startSize;
+    private GreenfootImage defaultTexture = null;
+    private double startSize = 5;
     private double size;
-    private double speed = 3;
-    private int damageAmount = 10;
     
     private boolean cooldownActive = false;
     private double cooldownDuration = 1.0;
@@ -18,28 +16,87 @@ public class Enemy extends Actor
     private static GreenfootImage hitTexture = null;
     private Timer hitAnimTimer;
     
-    private int health;
+    //private GreenfootImage texture;
+    private int health = 4;
+    private double speed = 3;
     private int damage = 10;
     private double attackRange = 5;
     private double attackDelay = 2;
-    private Timer attackTimer;
     
+    private Timer attackTimer;
     private Game gameWorld;
     private Player player;
     private ArrayList<Wall> walls;
     
-    public Enemy(double x, double y, int h)
-    {
+    public enum EnemyTypes {
+        BASIC,
+        TANK,
+        SWIFT,
+        RANGED,
+        HEAL,
+        BOSS,
+    }
+    
+    public Enemy(double x, double y, EnemyTypes type) {
         super();
         
         pos = new Vector(x, y);
-        health = h;
-        startSize = h;
-        size = startSize;
+        initializeType(type);
         
         hitAnimation = new double[]{1, .9, .7, .75, 1};
         hitAnimTimer = new Timer(15, hitAnimation.length);
         attackTimer = new Timer(1, attackDelay);
+    }
+    
+    public void initializeType(EnemyTypes type) {
+        switch(type) {
+            case EnemyTypes.BASIC:
+                health = 2;
+                startSize = 3;
+                speed = 20;
+                damage = 10;
+                attackRange = 5;
+                attackDelay = 1;
+                defaultTexture = new GreenfootImage("button-blue.png");
+                break;
+            case EnemyTypes.TANK:
+                health = 5;
+                startSize = 4;
+                speed = 10;
+                damage = 15;
+                attackRange = 6;
+                attackDelay = 2;
+                defaultTexture = new GreenfootImage("button-red.png");
+                break;
+            case EnemyTypes.SWIFT:
+                health = 1;
+                startSize = 1;
+                speed = 40;
+                damage = 5;
+                attackRange = 2;
+                attackDelay = 0.2;
+                defaultTexture = new GreenfootImage("button-green.png");
+                break;
+            case EnemyTypes.RANGED:
+                health = 2;
+                startSize = 3;
+                speed = 5;
+                damage = 10;
+                attackRange = 50;
+                attackDelay = 5;
+                defaultTexture = new GreenfootImage("button-purple.png");
+                break;
+            case EnemyTypes.BOSS:
+                health = 30;
+                startSize = 6;
+                speed = 10;
+                damage = 40;
+                attackRange = 5;
+                attackDelay = 3;
+                defaultTexture = new GreenfootImage("button-yellow.png");
+                break;
+        }
+        size = startSize;
     }
     
     protected void addedToWorld(World world)
@@ -47,12 +104,11 @@ public class Enemy extends Actor
         world.addObject(hitAnimTimer, 0, 0);
         world.addObject(attackTimer, 0, 0);
         
-        if (texture == null)
+        if (defaultTexture == null)
             defaultTexture = ((Game)world).setupTexture("enemy.png", 256);
         if (hitTexture == null)
             hitTexture = ((Game)world).tintImage(defaultTexture, new Color(100, 0, 0));
-            
-        texture = defaultTexture;
+        
     }
     
     public void act()
@@ -77,7 +133,7 @@ public class Enemy extends Actor
             return;
         }
         Vector angleUnitVector = toPlayer.normalized();
-        pos.add(angleUnitVector.times((speed+(double)health/2)*((Game)getWorld()).getDeltaTime()));
+        pos.add(angleUnitVector.times((speed)*((Game)getWorld()).getDeltaTime()));
     }
     
     public boolean seesPlayer() {
@@ -102,6 +158,9 @@ public class Enemy extends Actor
     {
         if (health <= 0)
         {
+            if (getWorld().getObjects(Enemy.class).size() <= 1) {
+                gameWorld.waveComplete();
+            }
             getWorld().removeObject(hitAnimTimer);
             getWorld().removeObject(this);
         }
@@ -120,7 +179,7 @@ public class Enemy extends Actor
     public boolean hit()
     {
         hitAnimTimer.reset();
-        health--;
+        health --;
         if (health <= 0)
             return true;
         return false;

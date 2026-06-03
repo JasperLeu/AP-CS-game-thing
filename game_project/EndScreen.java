@@ -12,14 +12,14 @@ public class EndScreen extends Actor
     double waves;
     public EndScreen(double score, double waves) {
         super();
-        this.score =score;
+        this.score = score;
         this.waves = waves;
     }
     protected void addedToWorld(World world)
     {
-        Counter scoreCounter = new Counter("Score", score, Color.WHITE);
+        Counter scoreCounter = new Counter("", score, Color.WHITE);
         world.addObject(scoreCounter, 734, 136);
-        Counter waveCounter = new Counter("Wave", waves, Color.WHITE);
+        Counter waveCounter = new Counter("", waves, Color.WHITE);
         world.addObject(waveCounter, 746, 280);
     }
 }
