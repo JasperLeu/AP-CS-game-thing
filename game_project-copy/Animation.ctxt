@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.target=Animation
+comment0.text=\n\ Write\ a\ description\ of\ class\ Animation\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=frames\ frameRate
+comment1.target=Animation(java.lang.String[],\ double)
+comment2.params=world
+comment2.target=void\ addedToWorld(greenfoot.World)
+comment3.params=
+comment3.target=void\ act()
+comment4.params=
+comment4.target=boolean\ inAnimation()
+comment5.params=
+comment5.target=void\ play()
+numComments=6

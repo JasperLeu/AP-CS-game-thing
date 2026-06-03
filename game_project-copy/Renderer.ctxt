@@ -1,0 +1,21 @@
+#BlueJ class context
+comment0.target=Renderer
+comment0.text=\n\ Write\ a\ description\ of\ class\ Renderer\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=world
+comment1.target=void\ addedToWorld(greenfoot.World)
+comment2.params=
+comment2.target=void\ act()
+comment2.text=\n\ Act\ -\ do\ whatever\ the\ Renderer\ wants\ to\ do.\ This\ method\ is\ called\ whenever\n\ the\ 'Act'\ or\ 'Run'\ button\ gets\ pressed\ in\ the\ environment.\n
+comment3.params=
+comment3.target=void\ drawBackground()
+comment4.params=val\ min\ max
+comment4.target=double\ clamp(double,\ double,\ double)
+comment5.params=
+comment5.target=void\ drawWalls()
+comment6.params=pos\ wall\ angle
+comment6.target=Vector\ castRay(Vector,\ Wall,\ double)
+comment7.params=angle
+comment7.target=double\ normalizeAngle(double)
+comment8.params=
+comment8.target=java.lang.Object\ getLookedAt()
+numComments=9

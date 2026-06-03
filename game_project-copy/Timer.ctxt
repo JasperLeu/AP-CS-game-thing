@@ -1,0 +1,16 @@
+#BlueJ class context
+comment0.target=Timer
+comment0.text=\n\ Write\ a\ description\ of\ class\ Timer\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=fps\ max
+comment1.target=Timer(double,\ double)
+comment2.params=max
+comment2.target=Timer(double)
+comment3.params=
+comment3.target=void\ act()
+comment4.params=
+comment4.target=void\ finishTime()
+comment5.params=
+comment5.target=double\ getTime()
+comment6.params=
+comment6.target=void\ reset()
+numComments=7

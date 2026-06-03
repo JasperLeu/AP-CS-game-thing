@@ -1,0 +1,8 @@
+#BlueJ class context
+comment0.target=Crosshair
+comment0.text=\n\ Write\ a\ description\ of\ class\ Crosshair\ here.\n\ \n\ @author\ (your\ name)\ \n\ @version\ (a\ version\ number\ or\ a\ date)\n
+comment1.params=
+comment1.target=void\ act()
+comment2.params=world
+comment2.target=void\ addedToWorld(greenfoot.World)
+numComments=3

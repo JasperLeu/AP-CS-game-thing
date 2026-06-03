@@ -1,0 +1,15 @@
+#BlueJ class context
+comment0.target=Map
+comment1.params=world
+comment1.target=void\ addedToWorld(greenfoot.World)
+comment2.params=world\ wave
+comment2.target=void\ updateWallsOnWave(greenfoot.World,\ int)
+comment3.params=world\ wave
+comment3.target=void\ updateEnemiesOnWave(greenfoot.World,\ int)
+comment4.params=
+comment4.target=greenfoot.Color\ getFloorColor()
+comment5.params=
+comment5.target=greenfoot.Color\ getCeilingColor()
+comment6.params=
+comment6.target=java.util.ArrayList\ getWalls()
+numComments=7
